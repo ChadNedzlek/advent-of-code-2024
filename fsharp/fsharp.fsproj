@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <NoWarn>FS0025</NoWarn>
+        <LangVersion>preview</LangVersion>
+        <RootNamespace>ChadNedzlek.AdventOfCode.Y2022.FSharp</RootNamespace>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <Content Include="..\data\data-*.txt">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <Link>data\%(Filename)%(Extension)</Link>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Include="helpers.fs" />
+        <Compile Include="problem3.fs" />
+        <Compile Include="Program.fs" />
+    </ItemGroup>
+
+</Project>
