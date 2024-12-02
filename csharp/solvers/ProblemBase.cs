@@ -94,7 +94,7 @@ namespace ChadNedzlek.AdventOfCode.Y2023.CSharp.solvers
                 ExecuteCore(data);
         }
 
-        protected abstract void ExecuteCore(IEnumerable<string> data);
+        protected abstract void ExecuteCore(string[] data);
     }
 
     public interface IFancyAsyncProblem
@@ -104,6 +104,6 @@ namespace ChadNedzlek.AdventOfCode.Y2023.CSharp.solvers
     
     public interface IFancyProblem
     {
-        void ExecuteFancy(IEnumerable<string> data);
+        void ExecuteFancy(string[] data);
     }
 }

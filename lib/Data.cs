@@ -19,77 +19,77 @@ public static class Data
             return await data.GetDataAsync(problem);
         }
 
-        string root = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-        return File.ReadAllLines(Path.Combine(root, "data", $"data-{problem:00}-{type}.txt"));
+        string root = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)!;
+        return await File.ReadAllLinesAsync(Path.Combine(root, "data", $"data-{problem:00}-{type}.txt"));
     }
 
-    public static async IAsyncEnumerable<ValueTuple<T1, T2>> As<T1, T2>(
-        this IAsyncEnumerable<string> data,
+    public static IEnumerable<ValueTuple<T1, T2>> As<T1, T2>(
+        this IEnumerable<string> data,
         [RegexPattern] string pattern)
     {
-        await foreach (string line in data)
+        foreach (string line in data)
         {
             yield return Parse<T1, T2>(line, pattern);
         }
     }
 
-    public static async IAsyncEnumerable<ValueTuple<T1, T2, T3>> As<T1, T2, T3>(
-        this IAsyncEnumerable<string> data,
+    public static IEnumerable<ValueTuple<T1, T2, T3>> As<T1, T2, T3>(
+        this IEnumerable<string> data,
         [RegexPattern] string pattern)
     {
-        await foreach (string line in data)
+        foreach (string line in data)
         {
             yield return Parse<T1, T2, T3>(line, pattern);
         }
     }
 
-    public static async IAsyncEnumerable<TTyped> AsTyped<T1, T2, T3, TTyped>(
-        this IAsyncEnumerable<string> data,
+    public static IEnumerable<TTyped> AsTyped<T1, T2, T3, TTyped>(
+        this IEnumerable<string> data,
         [RegexPattern] string pattern)
         where TTyped : IConvertable<(T1, T2, T3), TTyped>
     {
-        await foreach (string line in data)
+        foreach (string line in data)
         {
             yield return Parse<T1, T2, T3>(line, pattern);
         }
     }
 
-    public static async IAsyncEnumerable<ValueTuple<T1, T2, T3, T4>> As<T1, T2, T3, T4>(
-        IAsyncEnumerable<string> data,
+    public static IEnumerable<ValueTuple<T1, T2, T3, T4>> As<T1, T2, T3, T4>(
+        this IEnumerable<string> data,
         [RegexPattern] string pattern)
     {
-        await foreach (string line in data)
+        foreach (string line in data)
         {
             yield return Parse<T1, T2, T3, T4>(line, pattern);
         }
     }
 
-    public static async IAsyncEnumerable<ValueTuple<T1, T2, T3, T4, T5, T6>> As<T1, T2, T3, T4, T5, T6>(
-        IAsyncEnumerable<string> data,
+    public static IEnumerable<ValueTuple<T1, T2, T3, T4, T5, T6>> As<T1, T2, T3, T4, T5, T6>(
+        this IEnumerable<string> data,
         [RegexPattern] string pattern)
     {
-        await foreach (string line in data)
+        foreach (string line in data)
         {
             yield return Parse<T1, T2, T3, T4, T5, T6>(line, pattern);
         }
     }
 
-    public static async IAsyncEnumerable<ValueTuple<T1, T2, T3, T4, T5, T6, T7>> As<T1, T2, T3, T4, T5, T6, T7>(
-        IAsyncEnumerable<string> data,
+    public static IEnumerable<ValueTuple<T1, T2, T3, T4, T5, T6, T7>> As<T1, T2, T3, T4, T5, T6, T7>(
+        this IEnumerable<string> data,
         [RegexPattern] string pattern)
     {
-        await foreach (string line in data)
+        foreach (string line in data)
         {
             yield return Parse<T1, T2, T3, T4, T5, T6, T7>(line, pattern);
         }
     }
 
 
-    public static async IAsyncEnumerable<T1> As<T1>(
-        this IAsyncEnumerable<string> data,
+    public static IEnumerable<T1> As<T1>(
+        this IEnumerable<string> data,
         [RegexPattern] string pattern)
     {
-        await foreach (string line in data)
+        foreach (string line in data)
         {
             yield return Parse<T1>(line, pattern);
         }
