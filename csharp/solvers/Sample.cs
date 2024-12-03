@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Spectre.Console;
+﻿using System.Threading.Tasks;
 
-namespace ChadNedzlek.AdventOfCode.Y2023.CSharp.solvers
+namespace ChadNedzlek.AdventOfCode.Y2024.CSharp.solvers
 {
     public class SampleProblem : DualAsyncProblemBase
     {

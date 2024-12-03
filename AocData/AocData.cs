@@ -1,6 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -24,9 +22,9 @@ namespace ChadNedzlek.AdventOfCode.DataModule
             "ChadNedzlek",
             "AocData");
 
-        public AocData(int year)
+        public AocData(int year = 0)
         {
-            _year = year;
+            _year = year == 0 ? DateTime.Now.Year : year;
         }
 
         public async Task<string[]> GetDataAsync(int day)

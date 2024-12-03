@@ -10,7 +10,8 @@ public interface IAsyncSolver<TState, TSolution>
     Task<TSolution> GetSolutionAsync(TState state);
 }
 
-public class TaskBasedMemoSolver<TState, TSolution> : IAsyncSolver<TState, TSolution> where TState : ITaskMemoState<TState, TSolution>, IEquatable<TState>
+public class TaskBasedMemoSolver<TState, TSolution> : IAsyncSolver<TState, TSolution>
+    where TState : ITaskMemoState<TState, TSolution>, IEquatable<TState>
 {
     private readonly Dictionary<TState, TSolution> _solveCache = new();
     private readonly HashSet<TState> _started = new();
@@ -97,7 +98,7 @@ public class TaskBasedMemoSolver<TState, TSolution> : IAsyncSolver<TState, TSolu
 
         public void WaitForAllTasks()
         {
-            ((WaitForExecuteScheduler)Scheduler).WaitForAllTasks();
+            ((WaitForExecuteScheduler)Scheduler!).WaitForAllTasks();
         }
     }
 }

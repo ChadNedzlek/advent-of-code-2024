@@ -1,5 +1,4 @@
 using ChadNedzlek.AdventOfCode.Library;
-using ChadNedzlek.AdventOfCode.Y2023.CSharp;
 using FluentAssertions;
 
 namespace csharp.Tests;

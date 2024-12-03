@@ -11,11 +11,11 @@ namespace ChadNedzlek.AdventOfCode.Library;
 
 public static class Data
 {
-    public static async Task<string[]> GetDataAsync(int problem, string type = "real")
+    public static async Task<string[]> GetDataAsync(int problem, string type = "real", int year = 0)
     {
         if (type == "real")
         {
-            var data = new AocData(2024);
+            var data = new AocData(year);
             return await data.GetDataAsync(problem);
         }
 

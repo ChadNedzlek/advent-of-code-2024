@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ChadNedzlek.AdventOfCode.Library;
 using JetBrains.Annotations;
 
-namespace ChadNedzlek.AdventOfCode.Y2023.CSharp.solvers
+namespace ChadNedzlek.AdventOfCode.Y2024.CSharp.solvers
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
     public abstract class AsyncProblemBase : IProblemBase

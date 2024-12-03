@@ -3,7 +3,7 @@
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <NoWarn>CS8509;CS1998</NoWarn>
-        <RootNamespace>ChadNedzlek.AdventOfCode.Y2023.CSharp</RootNamespace>
+        <RootNamespace>ChadNedzlek.AdventOfCode.Y2024.CSharp</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
