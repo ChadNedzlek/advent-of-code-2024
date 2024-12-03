@@ -95,7 +95,7 @@ public static class Data
         }
     }
 
-    public static (T1, T2, T3, T4) Parse<T1, T2, T3, T4>(string line, [RegexPattern] string pattern)
+    public static (T1, T2, T3, T4) Parse<T1, T2, T3, T4>(this string line, [RegexPattern] string pattern)
     {
         var m = Regex.Match(line, pattern);
         return (
@@ -106,7 +106,7 @@ public static class Data
         );
     }
 
-    public static (T1, T2, T3, T4, T5, T6) Parse<T1, T2, T3, T4, T5, T6>(string line, [RegexPattern] string pattern)
+    public static (T1, T2, T3, T4, T5, T6) Parse<T1, T2, T3, T4, T5, T6>(this string line, [RegexPattern] string pattern)
     {
         var m = Regex.Match(line, pattern);
         return (
@@ -119,7 +119,7 @@ public static class Data
         );
     }
 
-    public static (T1, T2, T3, T4, T5, T6, T7) Parse<T1, T2, T3, T4, T5, T6, T7>(string line, [RegexPattern] string pattern)
+    public static (T1, T2, T3, T4, T5, T6, T7) Parse<T1, T2, T3, T4, T5, T6, T7>(this string line, [RegexPattern] string pattern)
     {
         var m = Regex.Match(line, pattern);
         return (
@@ -133,7 +133,7 @@ public static class Data
         );
     }
 
-    public static (T1, T2, T3) Parse<T1, T2, T3>(string line, [RegexPattern] string pattern)
+    public static (T1, T2, T3) Parse<T1, T2, T3>(this string line, [RegexPattern] string pattern)
     {
         var m = Regex.Match(line, pattern);
         if (m.Success == false)
@@ -145,7 +145,7 @@ public static class Data
         );
     }
 
-    public static (T1, T2) Parse<T1, T2>(string line, [RegexPattern] string pattern)
+    public static (T1, T2) Parse<T1, T2>(this string line, [RegexPattern] string pattern)
     {
         var m = Regex.Match(line, pattern);
         return (
@@ -154,7 +154,7 @@ public static class Data
         );
     }
 
-    public static T1 Parse<T1>(string line, [RegexPattern] string pattern)
+    public static T1 Parse<T1>(this string line, [RegexPattern] string pattern)
     {
         var m = Regex.Match(line, pattern);
         return (T1)Convert.ChangeType(m.Groups[1].Value, typeof(T1));
