@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ChadNedzlek.AdventOfCode.Library;
-using ChadNedzlek.AdventOfCode.Y2024.CSharp.solvers;
 using Mono.Options;
 using Spectre.Console;
 

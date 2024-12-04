@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ChadNedzlek.AdventOfCode.Library;
 
-namespace ChadNedzlek.AdventOfCode.Y2024.CSharp.solvers
+namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
 {
     public class Problem01 : AsyncProblemBase
     {

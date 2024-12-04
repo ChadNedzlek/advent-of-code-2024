@@ -349,11 +349,11 @@ public static class Algorithms
         return BreadthFirstSearch<TState, int, int>(initial, nextStates, isBetterState, null, null, null);
     }
    
-    public static long[,] DistanceFill(string[] input, GPoint2I start,
-        Func<GPoint2I, IEnumerable<GPoint2I>> movePoints) =>
+    public static long[,] DistanceFill(string[] input, GPoint2<int> start,
+        Func<GPoint2<int>, IEnumerable<GPoint2<int>>> movePoints) =>
         DistanceFill(input, start, p => movePoints(p).Select(m => (m, 1L)));
 
-    public static long[,] DistanceFill(string[] input, GPoint2I start, Func<GPoint2I, IEnumerable<(GPoint2I, long)>> movePoints)
+    public static long[,] DistanceFill(string[] input, GPoint2<int> start, Func<GPoint2<int>, IEnumerable<(GPoint2<int>, long)>> movePoints)
     {
         long[,] res = new long[input.Length,input[0].Length];
         for (var r = 0; r < res.GetLength(0); r++)
@@ -364,12 +364,12 @@ public static class Algorithms
 
         res[start.Row, start.Col] = 0;
 
-        Queue<(GPoint2I p, long d)> q = new();
+        Queue<(GPoint2<int> p, long d)> q = new();
         q.Enqueue((start, 0));
-        while (q.TryDequeue(out (GPoint2I p, long d) x))
+        while (q.TryDequeue(out (GPoint2<int> p, long d) x))
         {
-            (GPoint2I p, long d) = x;
-            foreach ((GPoint2I target, long cost) m in movePoints(p))
+            (GPoint2<int> p, long d) = x;
+            foreach ((GPoint2<int> target, long cost) m in movePoints(p))
             {
                 if (res[m.target.Row, m.target.Col] == -1)
                 {

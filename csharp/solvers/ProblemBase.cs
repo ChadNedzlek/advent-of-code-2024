@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using ChadNedzlek.AdventOfCode.Library;
 using JetBrains.Annotations;
 
-namespace ChadNedzlek.AdventOfCode.Y2024.CSharp.solvers
+namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
     public abstract class AsyncProblemBase : IProblemBase

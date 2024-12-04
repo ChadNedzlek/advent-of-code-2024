@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace ChadNedzlek.AdventOfCode.Y2024.CSharp.solvers
+namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
 {
     public class SampleProblem : DualAsyncProblemBase
     {

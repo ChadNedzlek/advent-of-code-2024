@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ChadNedzlek.AdventOfCode.Library;
 
-namespace ChadNedzlek.AdventOfCode.Y2023.CSharp.solvers
+namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
 {
     public class Problem04 : AsyncProblemBase
     {
@@ -17,7 +16,7 @@ namespace ChadNedzlek.AdventOfCode.Y2023.CSharp.solvers
             {
                 for (int c = 0; c < data[r].Length; c++)
                 {
-                    GPoint2I x = (r, c);
+                    GPoint2<int> x = (r, c);
                     for (int i = 0; i < 8; i++)
                     {
                         var p = Helpers.EightDirections[i];

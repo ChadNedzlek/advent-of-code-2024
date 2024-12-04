@@ -35,6 +35,15 @@ public static class Helpers
         }
     }
 
+    public static IEnumerable<(T value, int index0, int index1)> AsEnumerableWithIndex<T>(this T[,] arr)
+    {
+        for (int i0 = 0; i0 < arr.GetLength(0); i0++)
+        for (int i1 = 0; i1 < arr.GetLength(1); i1++)
+        {
+            yield return (arr[i0, i1], i0, i1);
+        }
+    }
+
     public static void For<T>(this T[,] arr, Action<T[,], int, int, T> act)
     {
         for (int i0 = 0; i0 < arr.GetLength(0); i0++)
@@ -46,7 +55,7 @@ public static class Helpers
 
     public static void For<T>(this T[,] arr, Action<T[,], int, int> act)
     {
-        For(arr, (arr, a, b, __) => act(arr, a, b));
+        For(arr, (a, i0, i1, __) => act(a, i0, i1));
     }
 
     public static void For<T>(this T[,] arr, Action<int, int> act)
@@ -54,10 +63,7 @@ public static class Helpers
         For(arr, (_, a, b, __) => act(a, b));
     }
         
-    public static IEnumerable<T> AsEnumerable<T>(this T value)
-    {
-        return Enumerable.Repeat(value, 1);
-    }
+    public static IEnumerable<T> AsEnumerable<T>(this T value) => [value];
 
     public static IEnumerable<int> AsEnumerable(this Range range)
     {
@@ -65,7 +71,9 @@ public static class Helpers
         return Enumerable.Range(start, count);
     }
 
-    public static int PosMod(this int x, int q) => (x % q + q) % q;
+    public static T PosMod<T>(this T x, T q)
+        where T : IModulusOperators<T, T, T>, IAdditionOperators<T, T, T>
+        => (x % q + q) % q;
         
     public static T Gcd<T>(T num1, T num2)
     where T: IEqualityOperators<T, T, bool>, IComparisonOperators<T,T,bool>, ISubtractionOperators<T,T,T>
@@ -73,10 +81,10 @@ public static class Helpers
         while (num1 != num2)
         {
             if (num1 > num2)
-                num1 = num1 - num2;
+                num1 -= num2;
  
             if (num2 > num1)
-                num2 = num2 - num1;
+                num2 -= num1;
         }
         return num1;
     }
@@ -101,6 +109,7 @@ public static class Helpers
             dict.Add(key, add);
         }
     }
+    
     public static IImmutableDictionary<TKey, TValue> AddOrUpdate<TKey, TValue>(
         this IImmutableDictionary<TKey, TValue> dict,
         TKey key,
@@ -116,21 +125,25 @@ public static class Helpers
             return dict.Add(key, add);
         }
     }
-        
-    public static void Increment<TKey>(
-        this IDictionary<TKey, int> dict,
+
+    public static void Increment<TKey, TValue>(
+        this IDictionary<TKey, TValue> dict,
         TKey key,
-        int amount = 1)
+        TValue? amount = default)
+        where TValue : struct, IAdditionOperators<TValue, TValue, TValue>, IMultiplicativeIdentity<TValue, TValue>
     {
-        AddOrUpdate(dict, key, amount, i => i + amount);
+        TValue a = amount.GetValueOrDefault(TValue.MultiplicativeIdentity);
+        dict.AddOrUpdate(key, a, c => c + a);
     }
-        
-    public static void Decrement<TKey>(
-        this IDictionary<TKey, int> dict,
+
+    public static void Decrement<TKey, TValue>(
+        this IDictionary<TKey, TValue> dict,
         TKey key,
-        int amount = 1)
+        TValue? amount = default)
+        where TValue : struct, ISubtractionOperators<TValue, TValue, TValue>, IMultiplicativeIdentity<TValue, TValue>
     {
-        Increment(dict, key, -amount);
+        TValue a = amount.GetValueOrDefault(TValue.MultiplicativeIdentity);
+        dict.AddOrUpdate(key, a, c => c - a);
     }
         
     public static void Increment<TKey>(
@@ -248,11 +261,11 @@ public static class Helpers
     }
     public static char Get(this IReadOnlyList<string> input, int i1, int i2, char defaultValue = default)
         => TryGet(input, i1, i2, out var value) ? value : defaultValue;
-    public static char Get(this IReadOnlyList<string> input, GPoint2I p, char defaultValue = default)
+    public static char Get(this IReadOnlyList<string> input, GPoint2<int> p, char defaultValue = default)
         => TryGet(input, p.Row, p.Col, out var value) ? value : defaultValue;
 
-    public static bool TryGet<T>(this T[,] input, GPoint2I p, out T value) => TryGet(input, p.Row, p.Col, out value);
-    public static T Get<T>(this T[,] input, GPoint2I p, T defaultValue = default)
+    public static bool TryGet<T>(this T[,] input, GPoint2<int> p, out T value) => TryGet(input, p.Row, p.Col, out value);
+    public static T Get<T>(this T[,] input, GPoint2<int> p, T defaultValue = default)
         => TryGet(input, p, out var value) ? value : defaultValue;
         
     public static bool TryGet<T>(this T[,] input, int i1, int i2, out T value)
@@ -290,7 +303,7 @@ public static class Helpers
         return true;
     }
 
-    public static bool IsInRange<T>(this T[,] input, GPoint2I p) => IsInRange<T>(input, p.Row, p.Col);
+    public static bool IsInRange<T>(this T[,] input, GPoint2<int> p) => IsInRange<T>(input, p.Row, p.Col);
         
     public static bool IsInRange<T>(this T[,] input, int i1, int i2)
     {
@@ -306,9 +319,9 @@ public static class Helpers
         return true;
     }
 
-    public static readonly ImmutableArray<GPoint2I> EightDirections = [(-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1)];
-    public static readonly ImmutableArray<GPoint2I> OrthogonalDirections = [(-1, 0), (0, 1), (1, 0), (0, -1)];
-    public static readonly ImmutableArray<GPoint2I> DiagonalDirections = [(-1, 1), (1, 1), (1, -1), (-1, -1)];
+    public static readonly ImmutableArray<GPoint2<int>> EightDirections = [(-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1)];
+    public static readonly ImmutableArray<GPoint2<int>> OrthogonalDirections = [(-1, 0), (0, 1), (1, 0), (0, -1)];
+    public static readonly ImmutableArray<GPoint2<int>> DiagonalDirections = [(-1, 1), (1, 1), (1, -1), (-1, -1)];
 
     public static IEnumerable<int> RangeInc(int start, int end)
     {
