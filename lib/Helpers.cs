@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace ChadNedzlek.AdventOfCode.Library;
 
@@ -223,6 +224,9 @@ public static class Helpers
         value = l[i2];
         return true;
     }
+
+    public static T Get<T>(this IReadOnlyList<IReadOnlyList<T>> input, int i1, int i2, T defaultValue = default)
+        => TryGet(input, i1, i2, out var value) ? value : defaultValue;
         
     public static bool TryGet(this IReadOnlyList<string> input, int i1, int i2, out char value)
     {
@@ -242,8 +246,14 @@ public static class Helpers
         value = l[i2];
         return true;
     }
+    public static char Get(this IReadOnlyList<string> input, int i1, int i2, char defaultValue = default)
+        => TryGet(input, i1, i2, out var value) ? value : defaultValue;
+    public static char Get(this IReadOnlyList<string> input, GPoint2I p, char defaultValue = default)
+        => TryGet(input, p.Row, p.Col, out var value) ? value : defaultValue;
 
     public static bool TryGet<T>(this T[,] input, GPoint2I p, out T value) => TryGet(input, p.Row, p.Col, out value);
+    public static T Get<T>(this T[,] input, GPoint2I p, T defaultValue = default)
+        => TryGet(input, p, out var value) ? value : defaultValue;
         
     public static bool TryGet<T>(this T[,] input, int i1, int i2, out T value)
     {
@@ -262,6 +272,8 @@ public static class Helpers
         value = input[i1, i2];
         return true;
     }
+    public static T Get<T>(this T[,] input, int i1, int i2, T defaultValue = default)
+        => TryGet(input, i1, i2, out var value) ? value : defaultValue;
         
     public static bool TrySet<T>(this T[,] input, int i1, int i2, T value)
     {
@@ -293,6 +305,10 @@ public static class Helpers
         
         return true;
     }
+
+    public static readonly ImmutableArray<GPoint2I> EightDirections = [(-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1)];
+    public static readonly ImmutableArray<GPoint2I> OrthogonalDirections = [(-1, 0), (0, 1), (1, 0), (0, -1)];
+    public static readonly ImmutableArray<GPoint2I> DiagonalDirections = [(-1, 1), (1, 1), (1, -1), (-1, -1)];
 
     public static IEnumerable<int> RangeInc(int start, int end)
     {
@@ -384,4 +400,6 @@ public static class Helpers
             }
         }   
     }
+
+    public static IOrderedEnumerable<T> OrderBy<T>(this IEnumerable<T> source) => source.OrderBy(x => x);
 }

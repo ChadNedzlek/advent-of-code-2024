@@ -1,8 +1,11 @@
 ﻿using System.Numerics;
+using System.Text.RegularExpressions;
 
 namespace ChadNedzlek.AdventOfCode.Library;
 
-public readonly record struct GPoint2L(long Row, long Col) : IConvertable<(long r, long c), GPoint2L>
+public readonly record struct GPoint2L(long Row, long Col) : IConvertable<(long r, long c), GPoint2L>,
+    IAdditionOperators<GPoint2L, GPoint2L, GPoint2L>,
+    IMultiplyOperators<GPoint2L, int, GPoint2L>
 {
     public static implicit operator GPoint2L((long r, long c) p) => new(p.r, p.c);
 
@@ -16,13 +19,35 @@ public readonly record struct GPoint2L(long Row, long Col) : IConvertable<(long 
         return new GPoint2L(dRow + Row, dCol + Col);
     }
 
+    public GPoint2L Multiply(long scale)
+    {
+        return new GPoint2L(scale * Row, scale * Col);
+    }
+
     public bool Equals(long row, long col)
     {
         return Row == row && Col == col;
     }
+
+    public static GPoint2L operator +(GPoint2L left, GPoint2L right)
+    {
+        return left.Add(right);
+    }
+
+    public static GPoint2L operator *(GPoint2L left, int right)
+    {
+        return left.Multiply(right);
+    }
+
+    public static GPoint2L operator *(int left, GPoint2L right)
+    {
+        return right.Multiply(left);
+    }
 }
 
-public readonly record struct GPoint2I(int Row, int Col) : IConvertable<(int row, int col), GPoint2I>
+public readonly record struct GPoint2I(int Row, int Col) : IConvertable<(int row, int col), GPoint2I>,
+    IAdditionOperators<GPoint2I, GPoint2I, GPoint2I>,
+    IMultiplyOperators<GPoint2I, int, GPoint2I>
 {
     public static implicit operator GPoint2I((int row, int col) p) => new(p.row, p.col);
 
@@ -36,9 +61,29 @@ public readonly record struct GPoint2I(int Row, int Col) : IConvertable<(int row
         return new GPoint2I(dRow + Row, dCol + Col);
     }
 
+    public GPoint2I Multiply(int scale)
+    {
+        return new GPoint2I(scale * Row, scale * Col);
+    }
+
     public bool Equals(int row, int col)
     {
         return Row == row && Col == col;
+    }
+
+    public static GPoint2I operator +(GPoint2I left, GPoint2I right)
+    {
+        return left.Add(right);
+    }
+
+    public static GPoint2I operator *(GPoint2I left, int right)
+    {
+        return left.Multiply(right);
+    }
+
+    public static GPoint2I operator *(int left, GPoint2I right)
+    {
+        return right.Multiply(left);
     }
 }
 
