@@ -13,6 +13,7 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
             var part1 = data.Select(d => d.Split(' ').Select(int.Parse).ToImmutableList()).ToList();
             Console.WriteLine($"Safe: {part1.Count(IsSafe)}");
             Console.WriteLine($"Safish: {part1.Count(p => p.Select((_, i) => p.RemoveAt(i)).Any(IsSafe))}");
+            return;
 
             static bool IsSafe(IReadOnlyList<int> list)
             {

@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices.ComTypes;
+using JetBrains.Annotations;
 
 namespace ChadNedzlek.AdventOfCode.Library;
 
@@ -415,4 +416,6 @@ public static class Helpers
     }
 
     public static IOrderedEnumerable<T> OrderBy<T>(this IEnumerable<T> source) => source.OrderBy(x => x);
+
+    public static TOut Into<T, TOut>(this T input, [InstantHandle] Func<T, TOut> translate) => translate(input);
 }
