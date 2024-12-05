@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.ComTypes;
 using JetBrains.Annotations;
 
@@ -474,4 +475,15 @@ public static class Helpers
 
     public static IEnumerable<TOut> Select<T1, T2, T3, TOut>(this IEnumerable<ValueTuple<T1, T2, T3>> source, Func<T1, T2, T3, TOut> selector) =>
         source.Select(x => selector(x.Item1, x.Item2, x.Item3));
+
+    public static T Sum<T>(this IEnumerable<T> source) where T:IAdditionOperators<T,T,T>, IAdditiveIdentity<T,T> => source.Aggregate(T.AdditiveIdentity, (a, v) => a + v);
+
+    public static TOut Sum<TIn, TOut>(this IEnumerable<TIn> source, Func<TIn, TOut> selector)
+        where TOut : IAdditionOperators<TOut, TOut, TOut>, IAdditiveIdentity<TOut, TOut> =>
+        source.Aggregate(TOut.AdditiveIdentity, (a, v) => a + selector(v));
+    
+    public static (TOut1, TOut2) Sum<TIn, TOut1, TOut2>(this IEnumerable<TIn> source, Func<TIn, (TOut1, TOut2)> selector)
+        where TOut1 : IAdditionOperators<TOut1, TOut1, TOut1>, IAdditiveIdentity<TOut1, TOut1>
+        where TOut2 : IAdditionOperators<TOut2, TOut2, TOut2>, IAdditiveIdentity<TOut2, TOut2> =>
+        source.Aggregate((TOut1.AdditiveIdentity, TOut2.AdditiveIdentity), (a, v) => selector(v).Into(tuple => (tuple.Item1 + a.Item1, tuple.Item2 + a.Item2)));
 }
