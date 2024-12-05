@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ChadNedzlek.AdventOfCode.Library;
@@ -9,40 +10,33 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
     {
         protected override async Task ExecuteCoreAsync(string[] data)
         {
-            int xmases = 0;
-            int pattern = 0;
-            Infinite2I<int> mas = new();
+            int[] four = [0, 1, 2, 3];
+            int[,] halfMases = data.Select2D(_ => 0);
+            var xmases = data.AsEnumerableWithIndex()
+                .Select((_, r, c) => new GPoint2<int>(r, c))
+                .Sum(p => Helpers.EightDirections
+                    .Sum(d => new string(four.Select(i => data.Get(p + d * i)).ToArray()) is "XMAS" ? 1 : 0));
+            
             for (int r = 0; r < data.Length; r++)
             {
                 for (int c = 0; c < data[r].Length; c++)
                 {
                     GPoint2<int> x = (r, c);
-                    for (int i = 0; i < 8; i++)
+                    
+                    foreach(var p in  Helpers.DiagonalDirections)
                     {
-                        var p = Helpers.EightDirections[i];
-                        var str = new string(Enumerable.Range(0, 4).Select(m => x + m * p).Select(d => data.Get(d)).ToArray());
-                        if (str is "XMAS")
-                        {
-                            Helpers.VerboseLine($"Found XMAS at {r},{c} in direction {i}");
-                            xmases++;
-                        }
-                    }
-                    for (int i = 0; i < 4; i++)
-                    {
-                        var p = Helpers.DiagonalDirections[i];
-                        var str = new string(Enumerable.Range(0, 3).Select(m => x + m * p).Select(d => data.Get(d)).ToArray());
+                        var str = new string(Enumerable.Range(0, 3).Select(m => data.Get(x + m * p)).ToArray());
                         if (str is "MAS")
                         {
-                            var a = x + p;
-                            mas[a.Row, a.Col]++;
-                            Helpers.VerboseLine($"Found half-MAS at {a} in direction {i}");
+                            (x + p).Do(a => halfMases[a.Row, a.Col]++);
+                            Helpers.VerboseLine($"Found half-MAS at {x + p} in direction {p}");
                         }
                     }
                 }
             }
             
             Console.WriteLine($"Found {xmases} XMAS's");
-            Console.WriteLine($"Found {mas.Count(a => a == 2)} X-MAS's");
+            Console.WriteLine($"Found {halfMases.AsEnumerable().Count(a => a == 2)} X-MAS's");
         }
     }
 }

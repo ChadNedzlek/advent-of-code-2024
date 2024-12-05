@@ -44,6 +44,24 @@ public static class Helpers
             yield return (arr[i0, i1], i0, i1);
         }
     }
+    
+    public static IEnumerable<(T value, int index0, int index1)> AsEnumerableWithIndex<T>(this IReadOnlyList<IReadOnlyList<T>> arr)
+    {
+        for (int i0 = 0; i0 < arr.Count; i0++)
+        for (int i1 = 0; i1 < arr[0].Count; i1++)
+        {
+            yield return (arr[i0][i1], i0, i1);
+        }
+    }
+    
+    public static IEnumerable<(char value, int index0, int index1)> AsEnumerableWithIndex(this IReadOnlyList<string> arr)
+    {
+        for (int i0 = 0; i0 < arr.Count; i0++)
+        for (int i1 = 0; i1 < arr[0].Length; i1++)
+        {
+            yield return (arr[i0][i1], i0, i1);
+        }
+    }
 
     public static void For<T>(this T[,] arr, Action<T[,], int, int, T> act)
     {
@@ -418,4 +436,42 @@ public static class Helpers
     public static IOrderedEnumerable<T> OrderBy<T>(this IEnumerable<T> source) => source.OrderBy(x => x);
 
     public static TOut Into<T, TOut>(this T input, [InstantHandle] Func<T, TOut> translate) => translate(input);
+
+    public static void Do<T>(this T input, [InstantHandle] Action<T> act) => act(input);
+
+    public static IReadOnlyList<IReadOnlyList<T>> Select<T>(this IReadOnlyList<string> source, Func<int, int, char, T> selector)
+    {
+        List<List<T>> l = new List<List<T>>();
+        
+        for (int r = 0; r < source.Count; r++)
+        {
+            l.Add(source[r].Select((v, i) => selector(r, i, v)).ToList());
+        }
+
+        return l;
+    }
+
+    public static IReadOnlyList<IReadOnlyList<T>> Select<T>(this IReadOnlyList<string> source, Func<char, T> selector)
+        => Select(source, (_, _, v) => selector(v));
+    
+    public static T[,] Select2D<T>(this IReadOnlyList<string> source, Func<int, int, char, T> selector)
+    {
+        T[,] res = new T[source.Count, source[0].Length];
+        
+        for (int r = 0; r < source.Count; r++)
+        {
+            var row = source[r];
+            for (int c = 0; c < row.Length; c++)
+            {
+                res[r, c] = selector(r, c, row[c]);
+            }
+        }
+
+        return res;
+    }
+
+    public static T[,] Select2D<T>(this IReadOnlyList<string> source, Func<char, T> selector) => Select2D(source, (_, _, v) => selector(v));
+
+    public static IEnumerable<TOut> Select<T1, T2, T3, TOut>(this IEnumerable<ValueTuple<T1, T2, T3>> source, Func<T1, T2, T3, TOut> selector) =>
+        source.Select(x => selector(x.Item1, x.Item2, x.Item3));
 }
