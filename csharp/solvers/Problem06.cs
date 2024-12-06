@@ -6,7 +6,7 @@ using ChadNedzlek.AdventOfCode.Library;
 
 namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
 {
-    public class Problem06 : DualAsyncProblemBase
+    public class Problem06 : DualProblemBase
     {
         private static bool[,] GetVisited(string[] data)
         {
@@ -27,13 +27,13 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
             return visited;
         }
 
-        protected override async Task ExecutePart1Async(string[] data)
+        protected override void ExecutePart1(string[] data)
         {
             bool[,] visited = GetVisited(data);
             Console.WriteLine($"Visited {visited.AsEnumerable().Count(x => x)}");
         }
 
-        protected override async Task ExecutePart2Async(string[] data)
+        protected override void  ExecutePart2(string[] data)
         {
             bool[,] originalPath = GetVisited(data);
             char[,] baseMap = data.Select2D(x => x);

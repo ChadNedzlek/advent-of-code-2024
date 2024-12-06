@@ -71,6 +71,35 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
         {
         }
     }
+    
+    [UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
+    public abstract class DualProblemBase : AsyncProblemBase
+    {
+        protected override async Task ExecuteCoreAsync(string[] data)
+        {
+            var s = Stopwatch.StartNew();
+            try
+            {
+                ExecutePart2(data);
+            }
+            catch (HalfDoneException)
+            {
+                ExecutePart1(data);
+            }
+            Helpers.VerboseLine($"Elapsed: {s.Elapsed}");
+        }
+
+        protected abstract void ExecutePart1(string[] data);
+        
+        protected virtual void ExecutePart2(string[] data)
+        {
+            throw new HalfDoneException();
+        }
+
+        protected class HalfDoneException : Exception
+        {
+        }
+    }
 
     public interface IProblemBase
     {
