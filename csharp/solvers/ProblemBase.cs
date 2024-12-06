@@ -26,7 +26,6 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
             var id = int.Parse(m.Groups[1].Value);
             var data = await Data.GetDataAsync(id, type);
 
-
             if (this is IFancyAsyncProblem fancy)
                 await fancy.ExecuteFancyAsync(data);
             else 
