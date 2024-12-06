@@ -323,6 +323,7 @@ public static class Helpers
         return true;
     }
 
+    public static bool TrySet<T>(this T[,] input, GPoint2<int> p, T value) => TrySet(input, p.Row, p.Col, value);
     public static bool IsInRange<T>(this T[,] input, GPoint2<int> p) => IsInRange<T>(input, p.Row, p.Col);
         
     public static bool IsInRange<T>(this T[,] input, int i1, int i2)
@@ -417,7 +418,7 @@ public static class Helpers
         return arr;
     }
 
-    public static void PartialOrder<T>(List<T> bits, Func<T, T, bool> swap)
+    public static void PartialOrder<T>(IList<T> bits, Func<T, T, bool> swap)
     {
         var loop = true;
         while (loop)
@@ -470,6 +471,21 @@ public static class Helpers
 
         return res;
     }
+    
+    public static TOut[,] Select2D<TIn, TOut>(this TIn[,] source, Func<int, int, TIn, TOut> selector)
+    {
+        TOut[,] res = new TOut[source.GetLength(0), source.GetLength(1)];
+        
+        for (int r = 0; r < source.GetLength(0); r++)
+        {
+            for (int c = 0; c < source.GetLength(1); c++)
+            {
+                res[r, c] = selector(r, c, source[r, c]);
+            }
+        }
+
+        return res;
+    }
 
     public static T[,] Select2D<T>(this IReadOnlyList<string> source, Func<char, T> selector) => Select2D(source, (_, _, v) => selector(v));
 
@@ -486,4 +502,26 @@ public static class Helpers
         where TOut1 : IAdditionOperators<TOut1, TOut1, TOut1>, IAdditiveIdentity<TOut1, TOut1>
         where TOut2 : IAdditionOperators<TOut2, TOut2, TOut2>, IAdditiveIdentity<TOut2, TOut2> =>
         source.Aggregate((TOut1.AdditiveIdentity, TOut2.AdditiveIdentity), (a, v) => selector(v).Into(tuple => (tuple.Item1 + a.Item1, tuple.Item2 + a.Item2)));
+
+    public static TValue GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, TValue toAdd)
+    {
+        if (dict.TryGetValue(key, out var e)) return e;
+        dict.Add(key, toAdd);
+        return toAdd;
+    }
+    
+    public static TValue GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, Func<TKey, TValue> toAdd)
+    {
+        if (dict.TryGetValue(key, out var e)) return e;
+        e = toAdd(key);
+        dict.Add(key, e);
+        return e;
+    }
+    
+    public static T[,] WithValueSet<T>(this T[,] input, GPoint2<int> p, T value)
+    {
+        T[,] ret = (T[,])input.Clone();
+        ret[p.Row, p.Col] = value;
+        return ret;
+    }
 }
