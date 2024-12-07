@@ -582,4 +582,18 @@ public static class Helpers
         ret[p.Row, p.Col] = value;
         return ret;
     }
+
+    public static T Pow<T>(this T value, int exp)
+        where T : IMultiplyOperators<T, T, T>, IAdditiveIdentity<T, T>, IMultiplicativeIdentity<T,T>
+    {
+        if (exp == 0)
+            return T.MultiplicativeIdentity;
+        var total = value;
+        for (int i = 1; i < exp; i++)
+        {
+            total *= value;
+        }
+
+        return total;
+    }
 }
