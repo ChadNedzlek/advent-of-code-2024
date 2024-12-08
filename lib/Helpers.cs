@@ -66,6 +66,14 @@ public static class Helpers
             yield return (arr[i0][i1], i0, i1);
         }
     }
+    public static IEnumerable<(char value, GPoint2<int> point)> AsEnumerableWithPoint(this IReadOnlyList<string> arr)
+    {
+        for (int i0 = 0; i0 < arr.Count; i0++)
+        for (int i1 = 0; i1 < arr[0].Length; i1++)
+        {
+            yield return (arr[i0][i1], (i0, i1));
+        }
+    }
 
     public static void For<T>(this T[,] arr, Action<T[,], int, int, T> act)
     {
@@ -376,6 +384,25 @@ public static class Helpers
         }
 
         if (i2 < 0 || i2 >= input.GetLength(1))
+        {
+            return false;
+        }
+
+        return true;
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsInRange(this IReadOnlyList<string> input, GPoint2<int> p) => IsInRange(input, p.Row, p.Col);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsInRange(this IReadOnlyList<string> input, int i1, int i2)
+    {
+        if (i1 < 0 || i1 >= input.Count)
+        {
+            return false;
+        }
+
+        if (i2 < 0 || i2 >= input[0].Length)
         {
             return false;
         }

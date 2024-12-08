@@ -104,4 +104,6 @@ public readonly struct GPoint2<T> : IAdditionOperators<GPoint2<T>, GPoint2<T>, G
     {
         return !left.Equals(right);
     }
+
+    public override string ToString() => $"{{{Row}, {Col}}}";
 }

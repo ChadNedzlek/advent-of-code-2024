@@ -50,7 +50,8 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
                 Match m = Regex.Match(line, @"^(\d+):(\s*\d+)*$");
                 if (!m.Success) continue;
                 long total = long.Parse(m.Groups[1].Value);
-                long[] parts = m.Groups[2].Captures.Select(c => long.Parse(c.Value)).ToArray();
+                string[] strs = m.Groups[2].Captures.Select(c => c.Value.TrimStart()).ToArray();
+                long[] parts = strs.Select(long.Parse).ToArray();
                 for (long op = 0; op < 3.Pow(parts.Length - 1); op++)
                 {
                     long v = parts[0];
@@ -60,7 +61,7 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
                         {
                             0 => v * parts[i],
                             1 => v + parts[i],
-                            2 => long.Parse(v.ToString() + parts[i]),
+                            2 => long.Parse(v + strs[i]),
                             _ => throw new ArgumentException(),
                         };
 
