@@ -40,6 +40,7 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
                         {
                             if (!char.IsLetterOrDigit(x.value)) return false;
                             if (x == t) return false;
+                            if (x.value == t.value) return true;
 
                             var diff = x.point - t.point;
                             int gcd;
@@ -47,10 +48,10 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
                             else if (diff.Col == 0) gcd = diff.Row;
                             else gcd = Helpers.Gcd(Math.Abs(diff.Row), Math.Abs(diff.Col));
                             var step = diff / gcd;
-                            var search = t.point;
+                            var search = x.point + step;
                             while (data.IsInRange(search))
                             {
-                                if (data.Get(search) == x.value && search != x.point)
+                                if (data.Get(search) == x.value)
                                 {
                                     Helpers.VerboseLine($"Antinode at {t} for {x} at {search}");
                                     return true;
