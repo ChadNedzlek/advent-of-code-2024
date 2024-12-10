@@ -7,6 +7,10 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
 {
     public class Problem04 : AsyncProblemBase
     {
+        public Problem04(string executionMode) : base(executionMode)
+        {
+        }
+
         protected override async Task ExecuteCoreAsync(string[] data)
         {
             int[] four = [0, 1, 2, 3];

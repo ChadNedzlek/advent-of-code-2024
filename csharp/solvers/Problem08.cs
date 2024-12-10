@@ -10,6 +10,10 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
 {
     public class Problem08 : DualProblemBase
     {
+        public Problem08(string executionMode) : base(executionMode)
+        {
+        }
+
         protected override void ExecutePart1(string[] data)
         {
             int h = data.Length;

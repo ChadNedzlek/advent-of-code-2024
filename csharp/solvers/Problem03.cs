@@ -8,6 +8,10 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
 {
     public partial class Problem03 : AsyncProblemBase
     {
+        public Problem03(string executionMode) : base(executionMode)
+        {
+        }
+
         protected override async Task ExecuteCoreAsync(string[] data)
         {
             Console.WriteLine(

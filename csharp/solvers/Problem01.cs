@@ -8,6 +8,10 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
 {
     public class Problem01 : AsyncProblemBase
     {
+        public Problem01(string executionMode) : base(executionMode)
+        {
+        }
+
         protected override async Task ExecuteCoreAsync(string[] data)
         {
             IEnumerable<(int, int)> part1 = data.As<int, int>(@"(\d+) *(\d+)").ToList();

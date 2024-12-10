@@ -38,16 +38,18 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
 
             foreach (var type in Assembly.GetExecutingAssembly().GetTypes())
             {
+                if (!type.IsPublic) continue;
+                
                 var match = Regex.Match(type.Name, @"Problem(\d+)");
                 if (match.Success)
                 {
-                    problems.Add(int.Parse(match.Groups[1].Value), (IProblemBase)Activator.CreateInstance(type));
+                    problems.Add(int.Parse(match.Groups[1].Value), (IProblemBase)Activator.CreateInstance(type, dataType));
                 }
             }
 
             if (puzzle != 0)
             {
-                await problems[puzzle].ExecuteAsync(dataType);
+                await problems[puzzle].ExecuteAsync();
                 return 0;
             }
 
@@ -58,13 +60,13 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
                         .Title("Which puzzle to execute?")
                         .AddChoices(problems.Keys.OrderBy(i => i)));
 
-                await problems[problem].ExecuteAsync(dataType);
+                await problems[problem].ExecuteAsync();
                 return 0;
             }
 
             {
                 var problem = problems.MaxBy(p => p.Key).Value;
-                await problem.ExecuteAsync(dataType);
+                await problem.ExecuteAsync();
             }
 
             return 0;

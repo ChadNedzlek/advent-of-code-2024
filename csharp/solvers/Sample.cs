@@ -4,6 +4,10 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
 {
     public class SampleProblem : DualAsyncProblemBase
     {
+        public SampleProblem(string executionMode) : base(executionMode)
+        {
+        }
+
         protected override async Task ExecutePart1Async(string[] data)
         {
             

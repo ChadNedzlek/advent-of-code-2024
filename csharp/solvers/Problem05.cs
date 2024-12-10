@@ -8,6 +8,10 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
 {
     public class Problem05 : AsyncProblemBase
     {
+        public Problem05(string executionMode) : base(executionMode)
+        {
+        }
+
         protected override async Task ExecuteCoreAsync(string[] data)
         {
             List<(int before, int after)> ordering = [];

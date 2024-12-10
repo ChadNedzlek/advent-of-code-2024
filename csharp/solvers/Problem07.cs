@@ -9,6 +9,10 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
 {
     public class Problem07 : DualProblemBase
     {
+        public Problem07(string executionMode) : base(executionMode)
+        {
+        }
+
         protected override void ExecutePart1(string[] data)
         {
             long reached = 0;

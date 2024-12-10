@@ -4,6 +4,7 @@
         <OutputType>Exe</OutputType>
         <NoWarn>CS8509;CS1998</NoWarn>
         <RootNamespace>ChadNedzlek.AdventOfCode.Y2024.CSharp</RootNamespace>
+        <Nullable>disable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>

@@ -315,6 +315,23 @@ public static class Helpers
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool TryGet<T>(this ReadOnlySpan<T> input, int index, out T value)
+    {
+        if (index < 0 || index >= input.Length)
+        {
+            value = default;
+            return false;
+        }
+
+        value = input[index];
+        return true;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T Get<T>(this ReadOnlySpan<T> input, int index, T defaultValue = default) =>
+        TryGet(input, index, out var value) ? value : defaultValue;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static char Get(this IReadOnlyList<string> input, int i1, int i2, char defaultValue = default)
         => TryGet(input, i1, i2, out var value) ? value : defaultValue;
 
@@ -623,4 +640,6 @@ public static class Helpers
 
         return total;
     }
+
+    public static void VerboseLine() => VerboseLine("");
 }

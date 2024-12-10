@@ -1,12 +1,24 @@
-﻿namespace ChadNedzlek.AdventOfCode.Library;
+﻿using System;
 
-public readonly record struct RangeL(long Start, long Length)
+namespace ChadNedzlek.AdventOfCode.Library;
+
+public readonly struct RangeL
 {
+    public RangeL(long start, long length)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(length);
+        Start = start;
+        Length = length;
+    }
+
     /// <summary>
     /// Exclusive end boundary.
     /// </summary>
     /// <example>{Start:1, End:4} => [1, 2, 3]</example>
     public long End => Start + Length;
+
+    public long Start { get; init; }
+    public long Length { get; init; }
 
     public override string ToString() => $"{Start}-{End}";
 
@@ -37,4 +49,36 @@ public readonly record struct RangeL(long Start, long Length)
     }
 
     public bool Contains(long value) => Start <= value && value < End;
+
+    public static RangeL FromEnd(int end, int length) => new RangeL(end - length, length);
+
+    public RangeL FromEnd(long length, out RangeL? remaining)
+    {
+        if (Length <= length)
+        {
+            remaining = null;
+            return this;
+        }
+
+        remaining = this with { Length = Length - length };
+        return new RangeL(End - length, length);
+    }
+
+    public RangeL FromStart(long length, out RangeL? remaining)
+    {
+        if (Length <= length)
+        {
+            remaining = null;
+            return this;
+        }
+
+        remaining = new RangeL(Start + length, Length - length);
+        return this with { Length = length };
+    }
+
+    public void Deconstruct(out long start, out long length)
+    {
+        start = Start;
+        length = Length;
+    }
 }

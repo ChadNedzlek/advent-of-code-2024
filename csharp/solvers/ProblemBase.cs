@@ -10,13 +10,20 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
     [UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
     public abstract class AsyncProblemBase : IProblemBase
     {
-        public async Task ExecuteAsync(string type = "real")
+        protected AsyncProblemBase(string executionMode)
         {
-            if (type.StartsWith("test"))
+            ExecutionMode = executionMode;
+        }
+
+        public string ExecutionMode { get; }
+        public async Task ExecuteAsync()
+        {
+            string type = ExecutionMode;
+            if (ExecutionMode.StartsWith("test"))
             {
                 await ExecuteTests();
 
-                if (type.EndsWith("exit"))
+                if (ExecutionMode.EndsWith("exit"))
                     return;
 
                 type = "example";
@@ -43,6 +50,10 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
     [UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
     public class DualAsyncProblemBase : AsyncProblemBase
     {
+        public DualAsyncProblemBase(string executionMode) : base(executionMode)
+        {
+        }
+
         protected override async Task ExecuteCoreAsync(string[] data)
         {
             var s = Stopwatch.StartNew();
@@ -75,6 +86,10 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
     [UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
     public abstract class DualProblemBase : AsyncProblemBase
     {
+        protected DualProblemBase(string executionMode) : base(executionMode)
+        {
+        }
+
         protected override async Task ExecuteCoreAsync(string[] data)
         {
             var s = Stopwatch.StartNew();
@@ -103,17 +118,25 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
 
     public interface IProblemBase
     {
-        Task ExecuteAsync(string type = "real");
+        string ExecutionMode { get; }
+        Task ExecuteAsync();
     }
 
     [UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
     public abstract class SyncProblemBase : IProblemBase
     {
-        public async Task ExecuteAsync(string type = "real")
+        protected SyncProblemBase(string executionMode)
+        {
+            ExecutionMode = executionMode;
+        }
+
+        public string ExecutionMode { get; private set; }
+
+        public async Task ExecuteAsync()
         {
             var m = Regex.Match(GetType().Name, @"Problem(\d+)$");
             var id = int.Parse(m.Groups[1].Value);
-            var data = await Data.GetDataAsync(id, type);
+            var data = await Data.GetDataAsync(id, ExecutionMode);
             if (this is IFancyProblem fancy)
                 fancy.ExecuteFancy(data);
             else

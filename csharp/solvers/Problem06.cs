@@ -8,6 +8,10 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
 {
     public class Problem06 : DualProblemBase
     {
+        public Problem06(string executionMode) : base(executionMode)
+        {
+        }
+
         private static bool[,] GetVisited(string[] data)
         {
             bool[,] visited = data.Select2D(_ => false);

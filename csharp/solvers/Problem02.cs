@@ -8,6 +8,10 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
 {
     public class Problem02 : AsyncProblemBase
     {
+        public Problem02(string executionMode) : base(executionMode)
+        {
+        }
+
         protected override async Task ExecuteCoreAsync(string[] data)
         {
             var part1 = data.Select(d => d.Split(' ').Select(int.Parse).ToImmutableList()).ToList();
