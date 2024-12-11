@@ -405,7 +405,6 @@ public class Problem09 : SyncProblemBase
     {
         protected override void ExecutePart1(string[] data)
         {
-            throw new NotImplementedException();
         }
         
         protected override void ExecutePart2(string[] data)
