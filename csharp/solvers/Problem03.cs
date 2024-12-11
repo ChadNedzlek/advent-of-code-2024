@@ -13,7 +13,7 @@ public partial class Problem03 : AsyncProblemBase
         Console.WriteLine(
             "Result " + data.Aggregate(
                 new State(),
-                (s, line) => ParsingRegex.Matches(line)
+                (s, line) => Regex.Matches(line, @"mul\((\d{1,3}),(\d{1,3})\)|do\(\)|don't\(\)")
                     .Aggregate(
                         s with { Do = true },
                         (s, m) => m.Groups[0].Value switch
@@ -29,7 +29,4 @@ public partial class Problem03 : AsyncProblemBase
     {
         public State Add(int value) => this with { Sum = Sum + value, ConditionalSum = ConditionalSum + (Do ? value : 0) };
     }
-
-    [GeneratedRegex(@"mul\((\d{1,3}),(\d{1,3})\)|do\(\)|don't\(\)")]
-    private static partial Regex ParsingRegex { get; }
 }

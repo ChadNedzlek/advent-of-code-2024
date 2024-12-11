@@ -41,7 +41,3 @@ public class Problem11 : SyncProblemBase
         }
     }
 }
-
-public struct StoneState(int Value)
-{
-}

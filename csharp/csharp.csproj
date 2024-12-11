@@ -5,6 +5,7 @@
         <NoWarn>CS8509;CS1998</NoWarn>
         <RootNamespace>ChadNedzlek.AdventOfCode.Y2024.CSharp</RootNamespace>
         <Nullable>disable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>
@@ -15,6 +16,9 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="ComputeSharp" />
+      <PackageReference Include="ComputeSharp.Dxc" />
+      <PackageReference Include="ComputeSharp.Pix" />
       <PackageReference Include="JetBrains.Annotations" />
       <PackageReference Include="Mono.Options" />
       <PackageReference Include="Spectre.Console" />
