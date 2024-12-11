@@ -23,6 +23,7 @@
       <PackageReference Include="Mono.Options" />
       <PackageReference Include="Spectre.Console" />
       <PackageReference Include="System.Linq.Async" />
+      <PackageReference Include="TorchSharp-cuda-windows" />
     </ItemGroup>
 
     <ItemGroup>

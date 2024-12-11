@@ -20,5 +20,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
+    <PackageVersion Include="TorchSharp-cuda-windows" Version="0.104.0" />
   </ItemGroup>
 </Project>

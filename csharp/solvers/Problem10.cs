@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.Versioning;
 using ChadNedzlek.AdventOfCode.Library;
 using ComputeSharp;
+using TorchSharp;
 
 namespace ChadNedzlek.AdventOfCode.Y2024.CSharp;
 
@@ -22,6 +23,9 @@ public partial class Problem10 : SyncProblemBase
             ShaderImpl(data);
             Console.WriteLine($"[TIME] Shader impl: {s.Elapsed}");
         }
+        s.Restart();
+        TensorImpl(data);
+        Console.WriteLine($"[TIME] Shader impl: {s.Elapsed}");
     }
 
     private static void BasicArrayImpl(string[] data)
@@ -101,12 +105,11 @@ public partial class Problem10 : SyncProblemBase
         var sum = sums.ToArray().AsEnumerable().Sum();
         Console.WriteLine($"Shader sum: {sum}");
     }
-}
 
-public static class PointlessCrap
-{
-    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_sums")]
-    public static extern ref ReadWriteTexture2D<int> Sums(this ref global::ChadNedzlek.AdventOfCode.Y2024.CSharp.AddNeighbors value);
+    private void TensorImpl(string[] data)
+    {
+        var device = torch.cuda.is_available() ? torch.CUDA : torch.mps_is_available() ? torch.MPS : torch.CPU;
+    }
 }
 
 [ThreadGroupSize(DefaultThreadGroupSizes.XY)]

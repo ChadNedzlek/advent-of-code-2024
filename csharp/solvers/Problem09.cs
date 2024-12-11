@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
+using System.Runtime.Intrinsics;
 using ChadNedzlek.AdventOfCode.Library;
 
 namespace ChadNedzlek.AdventOfCode.Y2024.CSharp;
@@ -172,8 +174,6 @@ public class Problem09 : SyncProblemBase
 
     private class RangesImplProblem09 : DualProblemBase
     {
-        public List<long> Checksums { get; set; }
-
         protected override void ExecutePart1(string[] data)
         {
             LinkedList<(int? Id, RangeL Location)> ranges = BuildRanges(data);
@@ -266,8 +266,6 @@ public class Problem09 : SyncProblemBase
         {
             LinkedList<(int? Id, RangeL Location)> ranges = BuildRanges(data);
 
-            Queue<long> checksumChecks = new(Checksums);
-
             var toMove = ranges.Last;
             while (true)
             {
@@ -293,10 +291,6 @@ public class Problem09 : SyncProblemBase
                 }
 
                 toMove = nextMove is null ? ranges.Last.Previous : nextMove.Previous?.Previous;
-            }
-
-            if (checksumChecks.TryDequeue(out var missedOne))
-            {
             }
 
             WriteChecksum(ranges);
@@ -397,11 +391,108 @@ public class Problem09 : SyncProblemBase
                 {
                     long idSum = (r.Location.End + r.Location.Start - 1) * r.Location.Length / 2;
                     long partialSum = id * idSum;
+                    Helpers.Verbose($"{id}@{r.Location.Start}-{r.Location.Length}:{partialSum} ");
                     sum += partialSum;
                 }
             }
+            Helpers.VerboseLine();
 
             return sum;
+        }
+    }
+    
+    private class EmptyOnlyImplProblem09 : DualProblemBase
+    {
+        protected override void ExecutePart1(string[] data)
+        {
+            throw new NotImplementedException();
+        }
+        
+        protected override void ExecutePart2(string[] data)
+        {
+            string line = data[0];
+            var emptyStarts = new long[line.Length / 2 + 1];
+            var emptyLengths = new long[line.Length / 2 + 1];
+            var fileStarts = new long[line.Length / 2 + 1];
+            var fileLengths = new long[line.Length / 2 + 1];
+            int pos = 0;
+            for (int i = 0; i < line.Length; i++)
+            {
+                int iBlock = i / 2;
+                int len = line[i] - '0';
+                if (i % 2 == 0)
+                {
+                    fileStarts[iBlock] = pos;
+                    fileLengths[iBlock] = len;
+                }
+                else
+                {
+                    emptyStarts[iBlock] = pos;
+                    emptyLengths[iBlock] = len;
+                }
+
+                pos += len;
+            }
+
+            for (int iFile = fileStarts.Length - 1; iFile >= 0; iFile--)
+            {
+                ref long fileLength = ref fileLengths[iFile];
+                for (int iEmpty = 0; iEmpty < emptyLengths.Length; iEmpty++)
+                {
+                    ref long emptyLength = ref emptyLengths[iEmpty];
+                    if (emptyLength >= fileLength)
+                    {
+                        ref long emptyStart = ref emptyStarts[iEmpty];
+                        ref long fileStart = ref fileStarts[iFile];
+                        if (emptyStart > fileStart)
+                        {
+                            break;
+                        }
+                        
+                        Helpers.VerboseLine(
+                            $"Moving {fileLength} blocks of {iFile} to {emptyStart} (remaining: {emptyLength - fileLength})"
+                        );
+
+                        fileStart = emptyStart;
+                        emptyStart += fileLength;
+                        emptyLength -= fileLength;
+                        break;
+                    }
+                }
+            }
+
+            Vector512<long> sums = Vector512<long>.Zero;
+            Vector512<long> fileIds = Vector512.Create<long>([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]);
+            for (var iFile = 0; iFile < fileStarts.Length - 3; iFile += Vector512<long>.Count)
+            {
+                var starts = Vector512.Create<long>(fileStarts.AsSpan(iFile, Vector512<long>.Count));
+                var lengths = Vector512.Create<long>(fileLengths.AsSpan(iFile, Vector512<long>.Count));
+                Vector512<long> startDouble = starts << 1;
+                Vector512<long> startPlusEnd = startDouble + lengths - Vector512<long>.One;
+                Vector512<long> timesLength = startPlusEnd * lengths;
+                Vector512<long> dividedByTwo = timesLength >> 1;
+                Vector512<long> partialSums = dividedByTwo * fileIds;
+                sums += partialSums;
+                fileIds += Vector512.Create<long>(Vector512<long>.Count);
+                for (int io = 0; io < Vector512<long>.Count; io++)
+                {
+                    Helpers.Verbose($"{iFile + io}@{fileStarts[iFile + io]}-{fileLengths[iFile + io]}:{partialSums[io]} ");
+                }
+            }
+
+            long sum = Vector512.Sum(sums);
+
+            for (int i = fileStarts.Length - 1; i % Vector512<long>.Count != Vector512<long>.Count - 1; i--)
+            {
+                var start = fileStarts[i];
+                var length = fileLengths[i];
+                long partialSum = ((((start << 1) + length) * length) >> 1) * i;
+                sum += partialSum;
+                Helpers.Verbose($"{i}@{fileStarts[i]}-{fileLengths[i]}:{partialSum} ");
+            }
+            Helpers.VerboseLine();
+            
+            Console.WriteLine($"Vectorized: {sum}");
         }
     }
 
@@ -409,12 +500,16 @@ public class Problem09 : SyncProblemBase
     {
         var a = new ArrayImplProblem09();
         var r = new RangesImplProblem09();
+        var e = new EmptyOnlyImplProblem09();
         Stopwatch timer = Stopwatch.StartNew();
-        a.ExecuteAsync().GetAwaiter().GetResult();
-        Console.WriteLine($"[TIME] ArrayImpl: {timer.Elapsed}");
-        r.Checksums = a.Checksums;
+        // a.ExecuteAsync().GetAwaiter().GetResult();
+        // Console.WriteLine($"[TIME] ArrayImpl: {timer.Elapsed}");
+        // r.Checksums = a.Checksums;
         timer.Restart();
         r.ExecuteAsync().GetAwaiter().GetResult();
         Console.WriteLine($"[TIME] RangesImpl: {timer.Elapsed}");
+        timer.Restart();
+        e.ExecuteAsync().GetAwaiter().GetResult();
+        Console.WriteLine($"[TIME] VectorizedImpl: {timer.Elapsed}");
     }
 }
