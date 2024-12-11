@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-
-namespace ChadNedzlek.AdventOfCode.Library;
+﻿namespace ChadNedzlek.AdventOfCode.Library;
 
 public readonly record struct Point3I(int X, int Y, int Z) : IConvertable<(int x,int y, int z), Point3I>
 {

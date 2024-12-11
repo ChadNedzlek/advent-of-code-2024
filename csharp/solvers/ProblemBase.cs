@@ -10,20 +10,14 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
     [UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
     public abstract class AsyncProblemBase : IProblemBase
     {
-        protected AsyncProblemBase(string executionMode)
-        {
-            ExecutionMode = executionMode;
-        }
-
-        public string ExecutionMode { get; }
         public async Task ExecuteAsync()
         {
-            string type = ExecutionMode;
-            if (ExecutionMode.StartsWith("test"))
+            string type = Program.ExecutionMode;
+            if (Program.ExecutionMode.StartsWith("test"))
             {
                 await ExecuteTests();
 
-                if (ExecutionMode.EndsWith("exit"))
+                if (Program.ExecutionMode.EndsWith("exit"))
                     return;
 
                 type = "example";
@@ -50,7 +44,7 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
     [UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
     public class DualAsyncProblemBase : AsyncProblemBase
     {
-        public DualAsyncProblemBase(string executionMode) : base(executionMode)
+        public DualAsyncProblemBase(string executionMode) : base()
         {
         }
 
@@ -86,10 +80,6 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
     [UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
     public abstract class DualProblemBase : AsyncProblemBase
     {
-        protected DualProblemBase(string executionMode) : base(executionMode)
-        {
-        }
-
         protected override async Task ExecuteCoreAsync(string[] data)
         {
             var s = Stopwatch.StartNew();
@@ -97,7 +87,7 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
             {
                 ExecutePart2(data);
             }
-            catch (HalfDoneException)
+            catch (NotDoneException)
             {
                 ExecutePart1(data);
             }
@@ -108,42 +98,30 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
         
         protected virtual void ExecutePart2(string[] data)
         {
-            throw new HalfDoneException();
-        }
-
-        protected class HalfDoneException : Exception
-        {
+            throw new NotDoneException();
         }
     }
 
     public interface IProblemBase
     {
-        string ExecutionMode { get; }
         Task ExecuteAsync();
     }
 
     [UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
     public abstract class SyncProblemBase : IProblemBase
     {
-        protected SyncProblemBase(string executionMode)
-        {
-            ExecutionMode = executionMode;
-        }
-
-        public string ExecutionMode { get; private set; }
-
         public async Task ExecuteAsync()
         {
             var m = Regex.Match(GetType().Name, @"Problem(\d+)$");
             var id = int.Parse(m.Groups[1].Value);
-            var data = await Data.GetDataAsync(id, ExecutionMode);
+            var data = await Data.GetDataAsync(id, Program.ExecutionMode);
             if (this is IFancyProblem fancy)
                 fancy.ExecuteFancy(data);
             else
                 ExecuteCore(data);
         }
 
-        protected abstract void ExecuteCore(string[] data);
+        protected virtual void ExecuteCore(string[] data) => throw new NotDoneException();
     }
 
     public interface IFancyAsyncProblem
@@ -155,4 +133,8 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
     {
         void ExecuteFancy(string[] data);
     }
+}
+
+public class NotDoneException : Exception
+{
 }

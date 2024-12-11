@@ -20,7 +20,14 @@ public static class Data
         }
 
         string root = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)!;
-        return await File.ReadAllLinesAsync(Path.Combine(root, "data", $"data-{problem:00}-{type}.txt"));
+        try
+        {
+            return await File.ReadAllLinesAsync(Path.Combine(root, "data", $"data-{problem:00}-{type}.txt"));
+        }
+        catch (FileNotFoundException)
+        {
+            throw new NoDataException();
+        }
     }
 
     public static IEnumerable<ValueTuple<T1, T2>> As<T1, T2>(
