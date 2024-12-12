@@ -33,6 +33,13 @@ public class AocData
 
     public async Task<string[]> GetDataAsync(int day)
     {
+        var tz = TimeZoneInfo.FindSystemTimeZoneById("US Eastern Standard Time");
+        DateTime releaseTime = new DateTime(_year, 12, day, 0, 0, 0) - TimeSpan.FromMinutes(5);
+        if (TimeZoneInfo.ConvertTimeToUtc(releaseTime, tz) > DateTime.UtcNow)
+        {
+            throw new NoDataException();
+        }
+
         string dir = Path.Combine(RootFolder, _year.ToString());
         Directory.CreateDirectory(dir);
         string targetPath = Path.Combine(dir, $"day-{day:D2}-input.txt");
