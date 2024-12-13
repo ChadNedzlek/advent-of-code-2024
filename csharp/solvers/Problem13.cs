@@ -43,23 +43,20 @@ public class Problem13 : SyncProblemBase
         // In terms of first a, then b,
         // Then just check that they aren't negative (the lines intersect in the box)
         // and that they are integers (the lines intersect at a point)
-        
-        long an = prize.Y * b.X - prize.X * b.Y;
-        long ad = a.Y * b.X - a.X * b.Y;
-        long sa = an / ad;
-        if (sa * ad != an || sa < 0)
+
+        (long sa, long rem) = long.DivRem(prize.Y * b.X - prize.X * b.Y,  a.Y * b.X - a.X * b.Y);
+        if (rem != 0)
         {
             Helpers.VerboseLine($"Cannot reach prize at {prize} (a)");
             return 0;
         }
 
-        long bn = prize.Y * a.X - prize.X * a.Y;
-        long bd = b.Y * a.X - b.X * a.Y;
-        long sb = bn / bd;
-        if (sb * bd != bn || sb < 0)
+        (long sb, rem) = long.DivRem(prize.Y * a.X - prize.X * a.Y,  b.Y * a.X - b.X * a.Y);
+        if (rem != 0)
         {
             Helpers.VerboseLine($"Cannot reach prize at {prize} (b)");
         }
+
         Helpers.VerboseLine($"Reached prize with {sa} A and {sb} B");
         return 3 * sa + sb;
     }
