@@ -36,6 +36,14 @@ public class Problem13 : SyncProblemBase
 
     private static long SearchPrize(Point2<long> a, Point2<long> b, Point2<long> prize)
     {
+        // This is, in fact, a line intersection problem/linear algebra
+        // Rearrange the equations:
+        //   sa * a.x + sb * b.x = prize.x
+        //   sa * a.y + sb * b.y = prize.y
+        // In terms of first a, then b,
+        // Then just check that they aren't negative (the lines intersect in the box)
+        // and that they are integers (the lines intersect at a point)
+        
         long an = prize.Y * b.X - prize.X * b.Y;
         long ad = a.Y * b.X - a.X * b.Y;
         long sa = an / ad;
@@ -53,6 +61,6 @@ public class Problem13 : SyncProblemBase
             Helpers.VerboseLine($"Cannot reach prize at {prize} (b)");
         }
         Helpers.VerboseLine($"Reached prize with {sa} A and {sb} B");
-        return sa + sa + sa + sb;
+        return 3 * sa + sb;
     }
 }
