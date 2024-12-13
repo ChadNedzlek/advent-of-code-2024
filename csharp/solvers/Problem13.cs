@@ -44,10 +44,12 @@ public class Problem13 : SyncProblemBase
         // Then just check that they aren't negative (the lines intersect in the box)
         // and that they are integers (the lines intersect at a point)
 
+        long denominator = a.Y * b.X - a.X * b.Y;
+        
         (long sa, long rem) = long.DivRem(
             prize.Y * b.X - prize.X * b.Y,
             /*-------------------------*/
-            a.Y * b.X - a.X * b.Y);
+            denominator);
         if (rem != 0)
         {
             Helpers.VerboseLine($"Cannot reach prize at {prize} (a)");
@@ -55,13 +57,14 @@ public class Problem13 : SyncProblemBase
         }
 
         (long sb, rem) = long.DivRem(
-            prize.Y * a.X - prize.X * a.Y,
+            prize.X * a.Y - prize.Y * a.X,
             /*-------------------------*/
-            b.Y * a.X - b.X * a.Y
+            denominator
         );
         if (rem != 0)
         {
             Helpers.VerboseLine($"Cannot reach prize at {prize} (b)");
+            return 0;
         }
 
         Helpers.VerboseLine($"Reached prize with {sa} A and {sb} B");
