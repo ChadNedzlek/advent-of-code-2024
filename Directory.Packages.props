@@ -21,5 +21,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
     <PackageVersion Include="TorchSharp-cuda-windows" Version="0.104.0" />
+    <PackageVersion Include="SkiaSharp" Version="3.116.1" />
   </ItemGroup>
 </Project>

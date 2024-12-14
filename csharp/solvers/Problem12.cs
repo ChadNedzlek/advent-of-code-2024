@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Versioning;
 using ChadNedzlek.AdventOfCode.Library;
+using ComputeSharp;
 using TorchSharp;
 
 namespace ChadNedzlek.AdventOfCode.Y2024.CSharp;
@@ -10,9 +12,9 @@ public class Problem12 : SyncProblemBase
 {
     protected override void ExecuteCore(string[] data)
     {
-        int[,] ids = data.Select2D(_ => 0);
+        int[,] ids = data.Select2D(_ => -1);
 
-        int count = 0;
+        int idCount = 0;
 
         int cRows = data.Length;
         int cCols = data[0].Length;
@@ -20,16 +22,15 @@ public class Problem12 : SyncProblemBase
         {
             for (int c = 0; c < cCols; c++)
             {
-                if (ids[r, c] == 0)
+                if (ids[r, c] == -1)
                 {
-                    MarkRegion((r, c), ++count, data[r][c]);
+                    MarkRegion((r, c), idCount++, data[r][c]);
                 }
             }
         }
 
         Dictionary<int, int> area = [];
         Dictionary<int, int> border = [];
-        Dictionary<int, int> corners = [];
         Dictionary<int, char> letters = [];
         for (int r = 0; r < cRows; r++)
         for (int c = 0; c < cCols; c++)
@@ -41,44 +42,36 @@ public class Problem12 : SyncProblemBase
             letters.TryAdd(id, data[r][c]);
         }
 
-        Dictionary<int, int> cornerDetection = [];
-
-        for (int r = 0; r <= cRows; r++)
-        for (int c = 0; c <= cCols; c++)
+        int[,] corners;
+        if (OperatingSystem.IsWindows() && false)
         {
-            var p = new GPoint2<int>(r, c);
-            cornerDetection.Clear();
-            cornerDetection.Increment(ids.Get(p - (1,1)));
-            cornerDetection.Increment(ids.Get(p - (0,1)));
-            cornerDetection.Increment(ids.Get(p - (1,0)));
-            cornerDetection.Increment(ids.Get(p));
-            int crisscrossAppleSauce = ids.Get(p) == ids.Get(p - (1, 1)) || ids.Get(p - (0, 1)) == ids.Get(p - (1, 0)) ? 2 : 0;
+            corners = GetCornersCuda(ids, idCount);
+        }
+        else
+        {
+            corners = GetCornersCpu(ids, idCount);
+        }
 
-            foreach ((int id, int overlaps) in cornerDetection)
-            {
-                if (overlaps == 2)
-                {
-                    corners.Increment(id, crisscrossAppleSauce);
-                }
 
-                if (overlaps % 2 == 1)
-                {
-                    corners.Increment(id);
-                }
-            }
+        Dictionary<int, int> cornerCounts = [];
+
+        for (int r = 0; r < cRows; r++)
+        for (int c = 0; c < cCols; c++)
+        {
+            cornerCounts.Increment(ids[r, c], corners[r, c]);
         }
 
         int[] allIds = area.Keys.ToArray();
         foreach (var id in allIds)
         {
-            Helpers.VerboseLine($"A region of {letters[id]} plants with area: {area[id]}, border: {border[id]}, sides(corners): {corners[id]}");
+            Helpers.VerboseLine($"A region of {letters[id]} plants with area: {area[id]}, border: {border[id]}, sides(corners): {cornerCounts[id]}");
         }
         Console.WriteLine($"Part 1 = {allIds.Sum(i => area[i] * border[i])}");
-        Console.WriteLine($"Part 2 = {allIds.Sum(i => area[i] * corners[i])}");
+        Console.WriteLine($"Part 2 = {allIds.Sum(i => area[i] * cornerCounts[i])}");
 
         void MarkRegion(GPoint2<int> p, int id, char c)
         {
-            if (ids.Get(p, -1) != 0 || data.Get(p) != c)
+            if (ids.Get(p, -1) != -1 || data.Get(p) != c)
             {
                 return;
             }
@@ -91,5 +84,60 @@ public class Problem12 : SyncProblemBase
                 }
             }
         }
+    }
+
+    [SupportedOSPlatform("Windows")]
+    public int[,] GetCornersCuda(int[,] ids, int idCount)
+    {
+        int cRows = ids.GetLength(0);
+        int cCols = ids.GetLength(1);
+        var g = GraphicsDevice.GetDefault();
+        ReadOnlyTexture2D<int> inflatedTexture = g.AllocateReadOnlyTexture2D(ids);
+        ReadWriteTexture3D<int> inflatedTexture3D = g.AllocateReadWriteTexture3D<int>(cRows * 2, cCols * 2, idCount);
+        throw new NotSupportedException();
+    }
+
+    public int[,] GetCornersCpu(int[,] ids, int idCount)
+    {
+        int cRows = ids.GetLength(0);
+        int cCols = ids.GetLength(1);
+        var inflated = new int[idCount, cRows * 2, cCols * 2];
+        for (int r = 0; r < cRows; r++)
+        for (int c = 0; c < cCols; c++)
+        {
+            int id = ids[r, c];
+            inflated[id, r * 2, c * 2] = 1;
+            inflated[id, r * 2 + 1, c * 2] = 1;
+            inflated[id, r * 2, c * 2 + 1] = 1;
+            inflated[id, r * 2 + 1, c * 2 + 1] = 1;
+        }
+        
+        var result = new int[idCount, cRows * 2, cCols * 2];
+        for (int i = 0; i < idCount; i++)
+        for (int r = 0; r < cRows; r++)
+        for (int c = 0; c < cCols; c++)
+        {
+            int sum = (
+                -1 * inflated.Get(i, r - 1, c) +
+                1 * inflated.Get(i, r + 1, c) +
+                -3 * inflated.Get(i, r, c - 1) +
+                3 * inflated.Get(i, r, c + 1)
+            );
+
+            result[i, r, c] = sum & 1;
+        }
+
+        int[,] deflated = new int[cRows, cCols];
+        for (int i = 0; i < idCount; i++)
+        for (int r = 0; r < cRows; r++)
+        for (int c = 0; c < cCols; c++)
+        {
+            deflated[r,c] += result[i, r * 2, c * 2] +
+                result[i, r * 2 + 1, c * 2] +
+                result[i, r * 2, c * 2 + 1] +
+                result[i, r * 2 + 1, c * 2 + 1];
+        }
+
+        return deflated;
     }
 }

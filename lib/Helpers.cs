@@ -368,6 +368,35 @@ public static class Helpers
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T Get<T>(this T[,] input, int i1, int i2, T defaultValue = default)
         => TryGet(input, i1, i2, out var value) ? value : defaultValue;
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool TryGet<T>(this T[,,] input, int i1, int i2, int i3, out T value)
+    {
+        if (i1 < 0 || i1 >= input.GetLength(0))
+        {
+            value = default;
+            return false;
+        }
+
+        if (i2 < 0 || i2 >= input.GetLength(1))
+        {
+            value = default;
+            return false;
+        }
+
+        if (i3 < 0 || i3 >= input.GetLength(2))
+        {
+            value = default;
+            return false;
+        }
+
+        value = input[i1, i2, i3];
+        return true;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T Get<T>(this T[,,] input, int i1, int i2, int i3, T defaultValue = default)
+        => TryGet(input, i1, i2, i3, out var value) ? value : defaultValue;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool TrySet<T>(this T[,] input, int i1, int i2, T value)

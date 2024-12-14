@@ -9,9 +9,10 @@ public readonly record struct Rect2<T>(Point2<T> BottomLeft, Point2<T> TopRight)
     ISubtractionOperators<T, T, T>, IUnaryNegationOperators<T, T>, IComparisonOperators<T, T, bool>, IDivisionOperators<T, T, T>, IModulusOperators<T, T, T>
 {
     public T Top => TopRight.Y;
+    public T Right => TopRight.X;
+    
     public T Left => BottomLeft.X;
     public T Bottom => BottomLeft.Y;
-    public T Right => TopRight.X;
 
     public T Height => Top - Bottom;
     public T Width => Right - Left;
