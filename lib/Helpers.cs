@@ -671,4 +671,8 @@ public static class Helpers
     }
 
     public static void VerboseLine() => VerboseLine("");
+
+    public static T Square<T>(this T value)
+        where T : IBinaryInteger<T>
+        => value * value;
 }
