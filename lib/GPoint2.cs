@@ -15,8 +15,7 @@ public readonly struct GPoint2<T> : IAdditionOperators<GPoint2<T>, GPoint2<T>, G
         IConvertable<(T row, T col), GPoint2<T>>,
         IEqualityOperators<GPoint2<T>,GPoint2<T>,bool>,
         IEquatable<GPoint2<T>>
-    where T : struct, IAdditionOperators<T, T, T>, IMultiplyOperators<T, T, T>, IAdditiveIdentity<T, T>, IMultiplicativeIdentity<T, T>,
-    ISubtractionOperators<T, T, T>, IUnaryNegationOperators<T, T>, IComparisonOperators<T, T, bool>, IDivisionOperators<T,T,T>, IEqualityOperators<T,T,bool>
+    where T : struct, INumber<T>
 {
     public GPoint2(T row, T col)
     {
@@ -69,6 +68,7 @@ public readonly struct GPoint2<T> : IAdditionOperators<GPoint2<T>, GPoint2<T>, G
 
     public readonly T Row;
     public readonly T Col;
+    public T OrthogonalDistance => T.Abs(Row) + T.Abs(Col);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Deconstruct(out T row, out T col)

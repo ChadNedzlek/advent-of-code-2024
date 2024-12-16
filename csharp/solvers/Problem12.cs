@@ -111,19 +111,23 @@ public partial class Problem12 : SyncProblemBase
     {
         public void Execute()
         {
-            var slice = new int3x3(
+            // Get a little 3x3 slice around the target points
+            var kernel = new int3x3(
                 inflate[ThreadIds.X - 1, ThreadIds.Y - 1, ThreadIds.Z], inflate[ThreadIds.X, ThreadIds.Y - 1, ThreadIds.Z], inflate[ThreadIds.X + 1, ThreadIds.Y - 1, ThreadIds.Z],
                 inflate[ThreadIds.X - 1, ThreadIds.Y,     ThreadIds.Z], inflate[ThreadIds.XYZ],                             inflate[ThreadIds.X + 1, ThreadIds.Y,     ThreadIds.Z],
                 inflate[ThreadIds.X - 1, ThreadIds.Y + 1, ThreadIds.Z], inflate[ThreadIds.X, ThreadIds.Y + 1, ThreadIds.Z], inflate[ThreadIds.X + 1, ThreadIds.Y + 1, ThreadIds.Z]
                 );
 
-            Int3 left = slice[MatrixIndex.M11, MatrixIndex.M21, MatrixIndex.M31];
-            Int3 right = slice[MatrixIndex.M13, MatrixIndex.M23, MatrixIndex.M33];
+            Int3 left = kernel[MatrixIndex.M11, MatrixIndex.M21, MatrixIndex.M31];
+            Int3 right = kernel[MatrixIndex.M13, MatrixIndex.M23, MatrixIndex.M33];
+            // Compute the gradients between left and right...
             Int3 hGrad = Hlsl.Abs(right - left);
             int hGradMagnitude = hGrad[0] + hGrad[1] + hGrad[2];
-            Int3 vGrad = Hlsl.Abs(slice[0] - slice[2]);
+            // ... and top and bottom.
+            Int3 vGrad = Hlsl.Abs(kernel[0] - kernel[2]);
             int vGradMagnitude = vGrad[0] + vGrad[1] + vGrad[2];
-            inflate[ThreadIds.XYZ] = Hlsl.BoolToInt(hGradMagnitude == vGradMagnitude && hGradMagnitude != 0) & slice[1][1];
+            // If they have equal, non-zero gradient magnitudes, and the center is in the id of interest, that's a corner, write a 1 down
+            inflate[ThreadIds.XYZ] = Hlsl.BoolToInt(hGradMagnitude == vGradMagnitude && hGradMagnitude != 0) & kernel[1][1];
         }
     }
     
@@ -135,6 +139,7 @@ public partial class Problem12 : SyncProblemBase
         public void Execute()
         {
             int sum = 0;
+            // Deflate and sum all the corners up for all the shapes to return
             for (int i = 0; i < inflated.Depth; i++)
             {
                 sum += inflated[ThreadIds.X * 2,     ThreadIds.Y * 2,    i];

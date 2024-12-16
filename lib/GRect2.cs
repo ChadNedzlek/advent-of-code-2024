@@ -5,8 +5,7 @@ namespace ChadNedzlek.AdventOfCode.Library;
 public readonly record struct GRect2<T>(GPoint2<T> TopLeft, GPoint2<T> BottomRight)
     : IMultiplyOperators<GRect2<T>, T, GRect2<T>>,
         IEqualityOperators<GRect2<T>, GRect2<T>, bool>
-    where T : struct, IAdditionOperators<T, T, T>, IMultiplyOperators<T, T, T>, IAdditiveIdentity<T, T>, IMultiplicativeIdentity<T, T>,
-    ISubtractionOperators<T, T, T>, IUnaryNegationOperators<T, T>, IComparisonOperators<T, T, bool>, IDivisionOperators<T, T, T>
+    where T : struct, INumber<T>
 {
     public T Top => TopLeft.Row;
     public T Left => TopLeft.Col;

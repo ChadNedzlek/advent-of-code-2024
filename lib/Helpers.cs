@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Text;
 using JetBrains.Annotations;
 
 namespace ChadNedzlek.AdventOfCode.Library;
@@ -417,6 +418,26 @@ public static class Helpers
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool TrySet<T>(this T[,] input, GPoint2<int> p, T value) => TrySet(input, p.Row, p.Col, value);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool TrySet(this IList<string> input, GPoint2<int> p, char value)
+    {
+        if (p.Row < 0 || p.Row >= input.Count)
+        {
+            value = default;
+            return false;
+        }
+
+        string l = input[p.Row];
+        if (p.Col < 0 || p.Col >= l.Length)
+        {
+            value = default;
+            return false;
+        }
+
+        input[p.Row] = new StringBuilder(l) { [p.Col] = value }.ToString();
+        return true;
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsInRange<T>(this T[,] input, GPoint2<int> p) => IsInRange<T>(input, p.Row, p.Col);

@@ -92,7 +92,8 @@ public static class Algorithms
                     loopbackEntry = score;
                 }
 
-                queue.Enqueue(n, getPriority(n));
+                TPriority priority = getPriority(n);
+                queue.Enqueue(n, priority);
             }
         }
 
