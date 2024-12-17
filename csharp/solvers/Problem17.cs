@@ -62,6 +62,7 @@ public class Problem17 : SyncProblemBase
         byte firstConstant = 255;
         byte secondConstant = 255;
 
+        Console.Write("Output: ");
         bool wrote = false;
         for (int ip = 0; ip < ins.Length; ip+=2)
         {
@@ -127,7 +128,7 @@ public class Problem17 : SyncProblemBase
         var result = solver.Solve(new StupidState(0, ins.Reverse().ToImmutableList(), firstConstant, secondConstant));
         
         Console.WriteLine();
-        Console.WriteLine($"Even stupider value? {result}");
+        Console.WriteLine($"Reflective A register: {result}");
     }
 
     public readonly struct StupidState(long a, ImmutableList<int> mustOutput, byte firstConstant, byte secondConstant) : ITaskMemoState<StupidState, long>, IEquatable<StupidState>
