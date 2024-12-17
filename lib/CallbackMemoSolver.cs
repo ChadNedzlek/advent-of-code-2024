@@ -81,6 +81,41 @@ public interface ICallbackSolvable<TState, TSolution>
     ISolution<TState, TSolution> Solve();
 }
 
+public static class CallbackSolvable
+{
+    public static ImmediateSolution<TState, TSolution> Immediate<TState, TSolution>(
+        this ICallbackSolvable<TState, TSolution> solvable,
+        TSolution input
+    )
+        where TState : ICallbackSolvable<TState, TSolution>, IEquatable<TState> =>
+        new(input);
+
+    public static DelegatedSolution<TState, TSolution> Delegate<TState, TSolution>(
+        this ICallbackSolvable<TState, TSolution> solvable,
+        TState input,
+        Func<TSolution, TSolution> transform
+    )
+        where TState : ICallbackSolvable<TState, TSolution>, IEquatable<TState> =>
+        new([input], i => transform(i[0]));
+
+    public static DelegatedSolution<TState, TSolution> Delegate<TState, TSolution>(
+        this ICallbackSolvable<TState, TSolution> solvable,
+        TState a,
+        TState b,
+        Func<TSolution, TSolution, TSolution> transform
+    )
+        where TState : ICallbackSolvable<TState, TSolution>, IEquatable<TState> =>
+        new(ImmutableList.Create(a, b), l => transform(l[0], l[1]));
+
+    public static DelegatedSolution<TState, TSolution> Delegate<TState, TSolution>(
+        this ICallbackSolvable<TState, TSolution> solvable,
+        IEnumerable<TState> a,
+        Func<IEnumerable<TSolution>, TSolution> transform
+    )
+        where TState : ICallbackSolvable<TState, TSolution>, IEquatable<TState> =>
+        new(a.ToImmutableList(), transform);
+}
+
 public abstract class CallbackSolvable<TState, TSolution>
     : ICallbackSolvable<TState, TSolution>
     where TState : ICallbackSolvable<TState, TSolution>, IEquatable<TState>
