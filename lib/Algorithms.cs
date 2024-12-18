@@ -39,6 +39,91 @@ public static class Algorithms
         public TState Search() => PrioritySearch<TState, TPriority, TIdentity, TScore>((TState)this);
     }
 
+    public class CharMapAStar : BasicPriorityState<GPoint2<int>>
+    {
+        public char[,] Map { get; }
+        public bool AllowDiagonals { get; }
+        public ImmutableHashSet<char> BlockingCharacters { get; }
+
+        public CharMapAStar(char[,] map, GPoint2<int> start, GPoint2<int> end, bool allowDiagonals = false, params ImmutableHashSet<char> blockingCharacters) : base(start, end)
+        {
+            Map = map;
+            AllowDiagonals = allowDiagonals;
+            BlockingCharacters = blockingCharacters?.IsEmpty is not true ? blockingCharacters : ['#'];
+        }
+
+        public CharMapAStar(
+            IReadOnlyList<string> map,
+            GPoint2<int> start,
+            GPoint2<int> end,
+            bool allowDiagonals = false,
+            params ImmutableHashSet<char> blockingCharacters
+        ) : this(map.Select2D(c => c), start, end, allowDiagonals, blockingCharacters)
+        {
+        }
+
+        private CharMapAStar(CharMapAStar from, GPoint2<int> current) : base(from, current)
+        {
+            Map = from.Map;
+            BlockingCharacters = from.BlockingCharacters;
+        }
+
+        protected override BasicPriorityState<GPoint2<int>> With(GPoint2<int> current)
+        {
+            return new CharMapAStar(this, current);
+        }
+
+        protected override IEnumerable<GPoint2<int>> GetNextValues()
+        {
+            char defaultBlocking = BlockingCharacters.First();
+            return (AllowDiagonals ? Helpers.EightDirections : Helpers.OrthogonalDirections).Select(d => d + Current).Where(t => !BlockingCharacters.Contains(Map.Get(t, defaultBlocking)));
+        }
+
+        protected override long GetEstimateTo(GPoint2<int> target) => (target - Current).OrthogonalDistance;
+    }
+
+    public abstract class BasicPriorityState<T> : PriorityState<BasicPriorityState<T>, long, T, long>
+        where T : IEquatable<T>
+    {
+        public readonly T Current;
+        public readonly T End;
+        public readonly long Cost = 0;
+
+        public BasicPriorityState(T start, T end)
+        {
+            Current = start;
+            End = end;
+        }
+        
+        protected BasicPriorityState(BasicPriorityState<T> from, T current)
+        {
+            Current = current;
+            End = from.End;
+            Cost = from.Cost + from.GetEstimateTo(current);
+        }
+
+        public override IEnumerable<BasicPriorityState<T>> GetNextState()
+        {
+            return GetNextValues().Select(n => With(n));
+        }
+
+        protected abstract BasicPriorityState<T> With(T current);
+
+        protected abstract IEnumerable<T> GetNextValues();
+
+        protected abstract long GetEstimateTo(T target);
+
+        public override bool IsEndState() => Current.Equals(End);
+
+        public override long GetPriority() => Cost + GetEstimateTo(End);
+
+        public override T GetIdentity() => Current;
+
+        public override long GetScore() => Cost;
+
+        public override bool IsBetterScore(long a, long b) => a.CompareTo(b) < 0;
+    }
+
     public static TState PrioritySearch<TState, TPriority, TIdentity, TScore>(TState start)
     where TState : PriorityState<TState, TPriority, TIdentity, TScore>
         => PrioritySearch(

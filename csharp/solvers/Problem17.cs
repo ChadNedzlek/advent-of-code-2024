@@ -124,10 +124,11 @@ public class Problem17 : SyncProblemBase
                 var x => x,
             };
 
+        Console.WriteLine();
+        var s = Stopwatch.StartNew();
         TaskBasedMemoSolver<StupidState, long> solver = new();
         var result = solver.Solve(new StupidState(0, ins.Reverse().ToImmutableList(), firstConstant, secondConstant));
-        
-        Console.WriteLine();
+        Console.WriteLine($"[TIME] {s.Elapsed}");
         Console.WriteLine($"Reflective A register: {result}");
     }
 

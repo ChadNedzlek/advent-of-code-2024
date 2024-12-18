@@ -3,5 +3,6 @@
         <TargetFramework>net8.0</TargetFramework>
         <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
         <Nullable>disable</Nullable>
+        <LangVersion>latest</LangVersion>
     </PropertyGroup>
 </Project>
