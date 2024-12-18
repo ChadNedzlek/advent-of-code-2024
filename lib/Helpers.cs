@@ -163,10 +163,8 @@ public static class Helpers
         {
             return dict.SetItem(key, update(existing));
         }
-        else
-        {
-            return dict.Add(key, add);
-        }
+
+        return dict.Add(key, add);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -440,7 +438,7 @@ public static class Helpers
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsInRange<T>(this T[,] input, GPoint2<int> p) => IsInRange<T>(input, p.Row, p.Col);
+    public static bool IsInRange<T>(this T[,] input, GPoint2<int> p) => IsInRange(input, p.Row, p.Col);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsInRange<T>(this T[,] input, int i1, int i2)

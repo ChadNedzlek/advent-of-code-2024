@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.IO.Hashing;
 using System.Linq;
-using System.Runtime.InteropServices;
 using ChadNedzlek.AdventOfCode.Library;
 
 namespace ChadNedzlek.AdventOfCode.Y2024.CSharp;
@@ -60,7 +58,7 @@ public class Problem16 : SyncProblemBase
         Console.WriteLine($"Best cost?: {result.Cost}");
 
         Queue<(GPoint2<int> loc, GPoint2<int> dir, int cost)> evaluating = new();
-        var costs = new int[][,] { data.Select2D(_ => -1), data.Select2D(_ => -1), data.Select2D(_ => -1), data.Select2D(_ => -1) };
+        var costs = new[] { data.Select2D(_ => -1), data.Select2D(_ => -1), data.Select2D(_ => -1), data.Select2D(_ => -1) };
         costs[Helpers.OrthogonalDirections.IndexOf((0,1))].TrySet(start, 0);
         evaluating.Enqueue((start, (0,1), 0));
 

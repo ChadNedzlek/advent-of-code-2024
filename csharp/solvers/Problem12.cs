@@ -5,8 +5,6 @@ using System.Linq;
 using System.Runtime.Versioning;
 using ChadNedzlek.AdventOfCode.Library;
 using ComputeSharp;
-using Spectre.Console;
-using TorchSharp;
 
 namespace ChadNedzlek.AdventOfCode.Y2024.CSharp;
 

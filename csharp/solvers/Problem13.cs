@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Numerics;
 using ChadNedzlek.AdventOfCode.Library;
 
 namespace ChadNedzlek.AdventOfCode.Y2024.CSharp;

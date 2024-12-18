@@ -50,7 +50,7 @@ public class Problem17 : SyncProblemBase
                     1 => $"B = B ^ {op}",
                     2 => $"B = {comboText} % 8",
                     3 => $"jmp if A to {op}",
-                    4 => $"B = B ^ C",
+                    4 => "B = B ^ C",
                     5 => $"out {comboText} % 8",
                     6 => $"B = A >> {comboText}",
                     7 => $"C = A >> {comboText}",

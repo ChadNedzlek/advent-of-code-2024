@@ -87,7 +87,7 @@ public static class Algorithms
     {
         public readonly T Current;
         public readonly T End;
-        public readonly long Cost = 0;
+        public readonly long Cost;
 
         public BasicPriorityState(T start, T end)
         {
@@ -236,7 +236,7 @@ public static class Algorithms
 
     public class Blist<T> : IEnumerable<T>
     {
-        private int _size = 0;
+        private int _size;
         private List<T> _array;
         public int Count => _size;
 

@@ -67,8 +67,6 @@ public class Problem06 : DualProblemBase
 
                 guard += dir;
             }
-
-            return;
         }
     }
 }

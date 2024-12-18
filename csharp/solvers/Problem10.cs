@@ -2,7 +2,6 @@
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Runtime.Versioning;
 using ChadNedzlek.AdventOfCode.Library;
 using ComputeSharp;
@@ -10,7 +9,7 @@ using TorchSharp;
 
 namespace ChadNedzlek.AdventOfCode.Y2024.CSharp;
 
-public partial class Problem10 : SyncProblemBase
+public class Problem10 : SyncProblemBase
 {
     protected override void ExecuteCore(string[] data)
     {

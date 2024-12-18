@@ -12,20 +12,18 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
     {
         public async Task ExecuteAsync()
         {
-            string type = Program.ExecutionMode;
-            if (Program.ExecutionMode.StartsWith("test"))
+            if (Program.ExecutionMode is ExecutionMode.Test or ExecutionMode.TestOnly)
             {
                 await ExecuteTests();
 
-                if (Program.ExecutionMode.EndsWith("exit"))
+                if (Program.ExecutionMode is ExecutionMode.TestOnly)
                     return;
 
-                type = "example";
             }
             
             var m = Regex.Match(GetType().Name, @"Problem(\d+)$");
             var id = int.Parse(m.Groups[1].Value);
-            var data = await Data.GetDataAsync(id, type);
+            var data = await Data.GetDataAsync(id, Program.ExecutionMode != ExecutionMode.Normal);
 
             if (this is IFancyAsyncProblem fancy)
                 await fancy.ExecuteFancyAsync(data);
@@ -44,10 +42,6 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
     [UsedImplicitly(ImplicitUseTargetFlags.WithInheritors)]
     public class DualAsyncProblemBase : AsyncProblemBase
     {
-        public DualAsyncProblemBase(string executionMode) : base()
-        {
-        }
-
         protected override async Task ExecuteCoreAsync(string[] data)
         {
             var s = Stopwatch.StartNew();
@@ -114,7 +108,7 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
         {
             var m = Regex.Match(GetType().Name, @"Problem(\d+)$");
             var id = int.Parse(m.Groups[1].Value);
-            var data = await Data.GetDataAsync(id, Program.ExecutionMode);
+            var data = await Data.GetDataAsync(id, Program.ExecutionMode != ExecutionMode.Normal);
             if (this is IFancyProblem fancy)
                 fancy.ExecuteFancy(data);
             else

@@ -11,9 +11,9 @@ namespace ChadNedzlek.AdventOfCode.Library;
 
 public static class Data
 {
-    public static async Task<string[]> GetDataAsync(int problem, string type = "real", int year = 0)
+    public static async Task<string[]> GetDataAsync(int problem, bool sample = false, int year = 0)
     {
-        if (type == "real")
+        if (!sample)
         {
             var data = new AocData(year);
             return await data.GetDataAsync(problem);
@@ -22,7 +22,7 @@ public static class Data
         string root = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)!;
         try
         {
-            return await File.ReadAllLinesAsync(Path.Combine(root, "data", $"data-{problem:00}-{type}.txt"));
+            return await File.ReadAllLinesAsync(Path.Combine(root, "data", $"data-{problem:00}-example.txt"));
         }
         catch (FileNotFoundException)
         {

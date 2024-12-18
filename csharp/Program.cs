@@ -8,23 +8,32 @@ using Spectre.Console;
 
 namespace ChadNedzlek.AdventOfCode.Y2024.CSharp;
 
+public enum ExecutionMode
+{
+    Normal,
+    Sample,
+    Example = Sample,
+    Test,
+    TestOnly,
+}
+
 internal static class Program
 {
-    internal static string ExecutionMode { get; private set; }
+    internal static ExecutionMode ExecutionMode { get; private set; }
         
     static async Task<int> Main(string[] args)
     {
-        ExecutionMode = "real";
+        ExecutionMode = ExecutionMode.Normal;
         bool menu = false;
         int puzzle = 0;
         var os = new OptionSet
         {
-            { "example", v => ExecutionMode = "example" },
-            { "test", v => ExecutionMode = "test" },
-            { "test-only", v => ExecutionMode = "test-exit" },
+            { "example|sample|s|e", v => ExecutionMode = ExecutionMode.Sample },
+            { "test|t", v => ExecutionMode = ExecutionMode.Test },
+            { "test-only", v => ExecutionMode = ExecutionMode.TestOnly },
             { "prompt|p", v => menu = v != null },
             { "verbose|v", v => Helpers.IncludeVerboseOutput = (v != null) },
-            { "puzzle=", v => puzzle = int.Parse(v) },
+            { "puzzle|z=", v => puzzle = int.Parse(v) },
         };
 
         var left = os.Parse(args);

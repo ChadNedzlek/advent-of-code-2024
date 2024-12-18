@@ -4,7 +4,7 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp;
 
 public class SampleProblem : DualAsyncProblemBase
 {
-    public SampleProblem(string executionMode) : base(executionMode)
+    public SampleProblem(string executionMode)
     {
     }
 

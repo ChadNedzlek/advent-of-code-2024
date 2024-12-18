@@ -9,7 +9,7 @@ public class Problem18 : SyncProblemBase
     protected override void ExecuteCore(string[] data)
     {
         Span<GPoint2<int>> b = data.As<int, int>(@"^(\d+),(\d+)$").Select(x => (GPoint2<int>)x).ToArray();
-        int size = Program.ExecutionMode == "example" ? 7 : 71;
+        int size = Program.ExecutionMode == ExecutionMode.Sample ? 7 : 71;
         char[,] map = new char[size, size];
         foreach(var p in b[..1024])
         {

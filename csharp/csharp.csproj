@@ -25,7 +25,7 @@
       <PackageReference Include="System.IO.Hashing" />
       <PackageReference Include="System.Linq.Async" />
       <PackageReference Include="TorchSharp-cuda-windows" />
-        <PackageReference Include="SkiaSharp" />
+      <PackageReference Include="SkiaSharp" />
     </ItemGroup>
 
     <ItemGroup>

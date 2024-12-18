@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Numerics;
 using System.Runtime.Intrinsics;
 using ChadNedzlek.AdventOfCode.Library;
 
@@ -109,7 +108,7 @@ public class Problem09 : SyncProblemBase
                     Checksums.Add(CalculateChecksum(disk));
                 }
 
-                while (Helpers.Get<int>(disk, end, -1) == id)
+                while (Helpers.Get(disk, end, -1) == id)
                 {
                     end--;
                 }

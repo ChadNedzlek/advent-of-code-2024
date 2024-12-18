@@ -14,7 +14,7 @@ public class Problem14 : SyncProblemBase
 {
     protected override void ExecuteCore(string[] data)
     {
-        bool isReal = Program.ExecutionMode == "real";
+        bool isReal = Program.ExecutionMode == ExecutionMode.Normal;
         Point2<int> end = isReal ? (101, 103) : (11, 7);
         Rect2<int> bounds = new Rect2<int>((0, 0), end);
         ImmutableList<Bot> init = ImmutableList.CreateRange(

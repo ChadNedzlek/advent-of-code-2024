@@ -6,7 +6,7 @@ using ChadNedzlek.AdventOfCode.Library;
 
 namespace ChadNedzlek.AdventOfCode.Y2024.CSharp;
 
-public partial class Problem03 : AsyncProblemBase
+public class Problem03 : AsyncProblemBase
 {
     protected override async Task ExecuteCoreAsync(string[] data)
     {
