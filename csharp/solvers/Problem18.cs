@@ -22,7 +22,7 @@ public class Problem18 : SyncProblemBase
 
         GPoint2<int> startPoint = (0,0);
         GPoint2<int> endPoint = (size-1, size-1);
-        var solution = new TimedMapSearch(map, 1024, startPoint, endPoint).Search();
+        var solution = new Algorithms.BasicPriorityState<TimedMapSearchable, GPoint2<int>>(new TimedMapSearchable(map, 1024), startPoint, endPoint).Search();
         
         Console.WriteLine($"Distance: {solution.GetScore()}");
 
@@ -36,17 +36,15 @@ public class Problem18 : SyncProblemBase
             }
 
             int mid = (start + end) / 2;
-            var hasSolution = new TimedMapSearch(map, mid, startPoint, endPoint).Search() is not null;
+            var hasSolution = new Algorithms.BasicPriorityState<TimedMapSearchable, GPoint2<int>>(new TimedMapSearchable(map, mid), startPoint, endPoint).Search() is not null;
             if (hasSolution)
             {
                 Helpers.VerboseLine($"Has solution at {mid} [{start},{end}] => [{mid + 1},{end}]");
                 return BinarySearch(mid + 1, end);
             }
-            else
-            {
-                Helpers.VerboseLine($"No  solution at {mid} [{start},{end}] => [{start},{mid - 1}]");
-                return BinarySearch(start, mid - 1);
-            }
+
+            Helpers.VerboseLine($"No  solution at {mid} [{start},{end}] => [{start},{mid - 1}]");
+            return BinarySearch(start, mid - 1);
         }
 
         var sw = Stopwatch.StartNew();
@@ -56,37 +54,29 @@ public class Problem18 : SyncProblemBase
         Console.WriteLine($"First blocking byte: {blocking.Row},{blocking.Col}");
     }
 
-    private class TimedMapSearch : Algorithms.BasicPriorityState<GPoint2<int>>
+    private class TimedMapSearchable : Algorithms.IPrioritySearchable<GPoint2<int>>
     {
-        public readonly int[,] Map;
-        public readonly int Time;
+        private readonly int[,] _map;
+        private readonly int _time;
         
-        public TimedMapSearch(int[,] map, int time, GPoint2<int> start, GPoint2<int> end) : base(start, end)
+        public TimedMapSearchable(int[,] map, int time)
         {
-            Map = map;
-            Time = time;
+            _map = map;
+            _time = time;
         }
 
-        public TimedMapSearch(TimedMapSearch from, GPoint2<int> current) : base(from, current)
-        {
-            Map = from.Map;
-            Time = from.Time;
-        }
+        public long GetCost(GPoint2<int> from, GPoint2<int> to) => (to - from).OrthogonalDistance;
 
-        protected override TimedMapSearch With(GPoint2<int> current) => new(this, current);
-
-        protected override IEnumerable<GPoint2<int>> GetNextValues()
+        public IEnumerable<GPoint2<int>> GetNextValuesFrom(GPoint2<int> from)
         {
-            foreach (GPoint2<int> t in Helpers.OrthogonalDirections.Select(d => Current + d))
+            foreach (GPoint2<int> t in Helpers.OrthogonalDirections.Select(d => from + d))
             {
-                int time = Map.Get(t, -1);
-                if (time == 0 || time > Time)
+                int time = _map.Get(t, -1);
+                if (time == 0 || time > _time)
                 {
                     yield return t;
                 }
             }
         }
-
-        protected override long GetCostTo(GPoint2<int> target) => (target - Current).OrthogonalDistance;
     }
 }

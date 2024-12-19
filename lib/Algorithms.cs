@@ -125,6 +125,53 @@ public static class Algorithms
 
         public override bool IsBetterScore(long a, long b) => a.CompareTo(b) < 0;
     }
+    
+    public interface IPrioritySearchable<T>
+    {
+        long GetCost(T from, T to);
+        IEnumerable<T> GetNextValuesFrom(T from);
+        public long GetEstimate(T from, T to) => GetCost(from, to);
+    }
+
+    public sealed class BasicPriorityState<TDriver, TSearch> : PriorityState<BasicPriorityState<TDriver, TSearch>, long, TSearch, long>
+        where TDriver : IPrioritySearchable<TSearch>
+        where TSearch : IEquatable<TSearch>
+    {
+        private readonly TDriver _driver;
+        public readonly TSearch Current;
+        public readonly TSearch End;
+        public readonly long Cost;
+
+        public BasicPriorityState(TDriver driver, TSearch start, TSearch end)
+        {
+            _driver = driver;
+            Current = start;
+            End = end;
+        }
+
+        private BasicPriorityState(BasicPriorityState<TDriver, TSearch> from, TSearch current)
+        {
+            _driver = from._driver;
+            Current = current;
+            End = from.End;
+            Cost = from.Cost + _driver.GetCost(from.Current, current);
+        }
+
+        public override IEnumerable<BasicPriorityState<TDriver, TSearch>> GetNextState()
+        {
+            return _driver.GetNextValuesFrom(Current).Select(n => new BasicPriorityState<TDriver, TSearch>(this, n));
+        }
+
+        public override bool IsEndState() => Current.Equals(End);
+
+        public override long GetPriority() => Cost + _driver.GetEstimate(Current, End);
+
+        public override TSearch GetIdentity() => Current;
+
+        public override long GetScore() => Cost;
+
+        public override bool IsBetterScore(long a, long b) => a.CompareTo(b) < 0;
+    }
 
     public static TState PrioritySearch<TState, TPriority, TIdentity, TScore>(TState start)
     where TState : PriorityState<TState, TPriority, TIdentity, TScore>
