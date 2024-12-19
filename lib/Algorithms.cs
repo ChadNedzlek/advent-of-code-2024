@@ -79,7 +79,7 @@ public static class Algorithms
             return (AllowDiagonals ? Helpers.EightDirections : Helpers.OrthogonalDirections).Select(d => d + Current).Where(t => !BlockingCharacters.Contains(Map.Get(t, defaultBlocking)));
         }
 
-        protected override long GetEstimateTo(GPoint2<int> target) => (target - Current).OrthogonalDistance;
+        protected override long GetCostTo(GPoint2<int> target) => (target - Current).OrthogonalDistance;
     }
 
     public abstract class BasicPriorityState<T> : PriorityState<BasicPriorityState<T>, long, T, long>
@@ -111,7 +111,9 @@ public static class Algorithms
 
         protected abstract IEnumerable<T> GetNextValues();
 
-        protected abstract long GetEstimateTo(T target);
+        protected virtual long GetEstimateTo(T target) => GetCostTo(target);
+
+        protected abstract long GetCostTo(T target);
 
         public override bool IsEndState() => Current.Equals(End);
 
