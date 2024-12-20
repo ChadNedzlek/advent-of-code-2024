@@ -131,6 +131,7 @@ public static class Algorithms
         long GetCost(T from, T to);
         IEnumerable<T> GetNextValuesFrom(T from);
         public long GetEstimate(T from, T to) => GetCost(from, to);
+        public bool ReachedGoal(T test, T goal) => test.Equals(goal);
     }
 
     public sealed class BasicPriorityState<TDriver, TSearch> : PriorityState<BasicPriorityState<TDriver, TSearch>, long, TSearch, long>
@@ -162,7 +163,7 @@ public static class Algorithms
             return _driver.GetNextValuesFrom(Current).Select(n => new BasicPriorityState<TDriver, TSearch>(this, n));
         }
 
-        public override bool IsEndState() => Current.Equals(End);
+        public override bool IsEndState() => _driver.ReachedGoal(Current, End);
 
         public override long GetPriority() => Cost + _driver.GetEstimate(Current, End);
 

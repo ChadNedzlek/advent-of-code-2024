@@ -5,6 +5,8 @@
         <NoWarn>FS0025</NoWarn>
         <LangVersion>preview</LangVersion>
         <RootNamespace>ChadNedzlek.AdventOfCode.Y2022.FSharp</RootNamespace>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
     
     <ItemGroup>

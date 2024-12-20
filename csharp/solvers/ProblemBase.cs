@@ -24,11 +24,15 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
             var m = Regex.Match(GetType().Name, @"Problem(\d+)$");
             var id = int.Parse(m.Groups[1].Value);
             var data = await Data.GetDataAsync(id, Program.ExecutionMode != ExecutionMode.Normal);
-
+            
+            var timer = Stopwatch.StartNew();
             if (this is IFancyAsyncProblem fancy)
                 await fancy.ExecuteFancyAsync(data);
             else 
                 await ExecuteCoreAsync(data);
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine($"[TIME] {timer.Elapsed} ({timer.Elapsed.TotalMilliseconds} ms)");
+            Console.ResetColor();
         }
 
         protected virtual Task ExecuteTests()
@@ -109,10 +113,14 @@ namespace ChadNedzlek.AdventOfCode.Y2024.CSharp
             var m = Regex.Match(GetType().Name, @"Problem(\d+)$");
             var id = int.Parse(m.Groups[1].Value);
             var data = await Data.GetDataAsync(id, Program.ExecutionMode != ExecutionMode.Normal);
+            var timer = Stopwatch.StartNew();
             if (this is IFancyProblem fancy)
                 fancy.ExecuteFancy(data);
             else
                 ExecuteCore(data);
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine($"[TIME] {timer.Elapsed} ({timer.Elapsed.TotalMilliseconds} ms)");
+            Console.ResetColor();
         }
 
         protected virtual void ExecuteCore(string[] data) => throw new NotDoneException();

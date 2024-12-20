@@ -3,6 +3,8 @@
     <PropertyGroup>
         <RootNamespace>ChadNedzlek.AdventOfCode.DataModule</RootNamespace>
         <OutputType>Library</OutputType>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 
     <ItemGroup>

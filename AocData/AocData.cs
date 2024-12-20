@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -99,6 +100,11 @@ public class AocData
         }
         else
         {
+            if (!RuntimeFeature.IsDynamicCodeSupported)
+            {
+                throw new NotSupportedException();
+            }
+            
             async Task<string> TryGetCookie(IPage p)
             {
                 IReadOnlyList<BrowserContextCookiesResult> all = await p.Context.CookiesAsync();

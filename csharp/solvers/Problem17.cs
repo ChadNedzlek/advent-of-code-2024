@@ -59,11 +59,26 @@ public class Problem17 : SyncProblemBase
             }
         }
 
-        byte firstConstant = 255;
-        byte secondConstant = 255;
+        List<int> output = RunProgramForward(ins, a, b, c, out byte firstConstant, out byte secondConstant);
 
-        Console.Write("Output: ");
-        bool wrote = false;
+        Console.WriteLine($"Output: {string.Join(',', output)}");
+        Console.WriteLine();
+        var s = Stopwatch.StartNew();
+        TaskBasedMemoSolver<StupidState, long> solver = new();
+        var result = solver.Solve(new StupidState(0, ins.Reverse().ToImmutableList(), firstConstant, secondConstant));
+        Console.WriteLine($"[TIME] Bit bang : {s.Elapsed}");
+        Console.WriteLine($"Reflective A register: {result}");
+        s.Restart();
+        var reg = RunProgramBackward(ins, ins);
+        Console.WriteLine($"[TIME] Reverse program : {s.Elapsed}");
+        Console.WriteLine($"Reflective A register: {reg.a}");
+    }
+
+    private static List<int> RunProgramForward(int[] ins, long a, long b, long c, out byte firstConstant, out byte secondConstant)
+    {
+        firstConstant = 255;
+        secondConstant = 255;
+        List<int> output = [];
         for (int ip = 0; ip < ins.Length; ip+=2)
         {
             var code = ins[ip];
@@ -98,12 +113,7 @@ public class Problem17 : SyncProblemBase
                     b ^= c;
                     break;
                 case 5:
-                    if (wrote)
-                    {
-                        Console.Write(',');
-                    }
-                    wrote = true;
-                    Console.Write(combo % 8);
+                    output.Add((int)(combo % 8));
                     break;
                 case 6:
                     b = a >> (int)combo;
@@ -124,12 +134,85 @@ public class Problem17 : SyncProblemBase
                 var x => x,
             };
 
-        Console.WriteLine();
-        var s = Stopwatch.StartNew();
-        TaskBasedMemoSolver<StupidState, long> solver = new();
-        var result = solver.Solve(new StupidState(0, ins.Reverse().ToImmutableList(), firstConstant, secondConstant));
-        Console.WriteLine($"[TIME] {s.Elapsed}");
-        Console.WriteLine($"Reflective A register: {result}");
+        return output;
+    }
+    
+    private static (long a, long b, long c) RunProgramBackward(int[] ins, IReadOnlyList<int> output)
+    {
+        long a = 0;
+        long b = 0;
+        long c = 0;
+
+        Queue<int> toRead = new Queue<int>(output.Reverse());
+
+        long [] values = [0, 1, 2, 3, 4, 5, 6, 7];
+        int jumpTarget = -1;
+        int jumpSource = -1;
+        for (int ip = ins.Length - 2; ip >= 0 ; ip-=2)
+        {
+            if (jumpTarget == ip + 2)
+            {
+                ip = jumpSource - 2;
+                jumpTarget = -1;
+            }
+
+            var code = ins[ip];
+            var op = ins[ip + 1];
+            ref var combo = ref RefCombo(op, ref a, ref b, ref c, ref values);
+            switch (code)
+            {
+                case 0:
+                    a <<= (int)combo;
+                    //a >>= (int)combo;
+                    break;
+                case 1:
+                    b ^= op;
+                    break;
+                case 2:
+                    combo |= b;;
+                    //b = combo % 8;
+                    break;
+                case 3:
+                    if (toRead.Count != 0)
+                    {
+                        jumpTarget = op;
+                        jumpSource = ip;
+                    }
+                    break;
+                case 4:
+                    b ^= c;
+                    break;
+                case 5:
+                    combo |= toRead.Dequeue();
+                    //output.Add((int)(combo % 8));
+                    break;
+                case 6:
+                    a = b << (int)combo;
+                    // b = a >> (int)combo;
+                    break;
+                case 7:
+                    a = c << (int)combo;
+                    // c = a >> (int)combo;
+                    break;
+            }
+        }
+
+        return (a, b, c);
+
+        static ref long RefCombo(long value, ref long a, ref long b, ref long c, ref long[] values)
+        {
+            switch (value)
+            {
+                case 4:
+                    return ref a;
+                case 5:
+                    return ref b;
+                case 6:
+                    return ref c;
+                case var x:
+                    return ref values[x];
+            }
+        }
     }
 
     public readonly struct StupidState(long a, ImmutableList<int> mustOutput, byte firstConstant, byte secondConstant) : ITaskMemoState<StupidState, long>, IEquatable<StupidState>

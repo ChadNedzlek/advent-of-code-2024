@@ -103,7 +103,7 @@ public class TaskBasedMemoSolver<TState, TSolution> : IAsyncSolver<TState, TSolu
     }
 }
 
-public interface ITaskMemoState<TState, TSolution> where TState : ITaskMemoState<TState, TSolution>, IEquatable<TState> 
+public interface ITaskMemoState<TState, TSolution> where TState : ITaskMemoState<TState, TSolution>, IEquatable<TState>
 {
     Task<TSolution> Solve(IAsyncSolver<TState, TSolution> solver);
 }

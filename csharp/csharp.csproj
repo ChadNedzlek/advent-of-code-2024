@@ -6,6 +6,8 @@
         <RootNamespace>ChadNedzlek.AdventOfCode.Y2024.CSharp</RootNamespace>
         <Nullable>disable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 
     <ItemGroup>
