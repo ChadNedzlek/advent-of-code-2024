@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
 
 namespace ChadNedzlek.AdventOfCode.Library;
 
@@ -17,6 +18,7 @@ public readonly struct GPoint2<T> : IAdditionOperators<GPoint2<T>, GPoint2<T>, G
         IEquatable<GPoint2<T>>
     where T : struct, INumber<T>
 {
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public GPoint2(T row, T col)
     {
         Row = row;
@@ -68,7 +70,12 @@ public readonly struct GPoint2<T> : IAdditionOperators<GPoint2<T>, GPoint2<T>, G
 
     public readonly T Row;
     public readonly T Col;
-    public T OrthogonalDistance => T.Abs(Row) + T.Abs(Col);
+    
+    public T OrthogonalDistance
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => T.Abs(Row) + T.Abs(Col);
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Deconstruct(out T row, out T col)
