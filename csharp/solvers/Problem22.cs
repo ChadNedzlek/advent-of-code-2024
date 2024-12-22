@@ -41,41 +41,36 @@ public class Problem22 : SyncProblemBase
         Span<sbyte> target = stackalloc sbyte[4];
         target.Fill(-9);
         long bestBananas = 0;
-        while (target[0] <= 9)
+        for(target[0] = -9; target[0] <= 9; target[0]++)
+        for(target[1] = -9; target[1] <= 9; target[1]++)
+        for(target[2] = -9; target[2] <= 9; target[2]++)
+        for(target[3] = -9; target[3] <= 9; target[3]++)
         {
-            if (sbyte.Abs((sbyte)(target[0] + target[1])) <= 9 &&
-                sbyte.Abs((sbyte)(target[1] + target[2])) <= 9 &&
-                sbyte.Abs((sbyte)(target[2] + target[3])) <= 9)
+            if (sbyte.Abs((sbyte)(target[0] + target[1])) > 9 ||
+                sbyte.Abs((sbyte)(target[1] + target[2])) > 9 ||
+                sbyte.Abs((sbyte)(target[2] + target[3])) > 9)
             {
-                long bananas = 0;
-                var t = deltaSpan.IndexOf(target);
-                while (t != -1)
-                {
-                    int wait = t % 2000;
-                    if (wait + 3 < 2000)
-                    {
-                        bananas += priceSpan[t + 3];
-                    }
-
-                    int nextStart = t - wait + 2000;
-                    int inSpan = deltaSpan[nextStart..].IndexOf(target);
-                    if (inSpan == -1)
-                        break;
-                    t = nextStart + inSpan;
-                }
-
-                bestBananas = long.Max(bestBananas, bananas);
+                continue;
             }
 
-            target[^1]++;
-            for (int i = 3; i > 0; i--)
+            long bananas = 0;
+            var t = deltaSpan.IndexOf(target);
+            while (t != -1)
             {
-                if (target[i] > 9)
+                int wait = t % 2000;
+                if (wait + 3 < 2000)
                 {
-                    target[i] = -9;
-                    target[i - 1]++;
+                    bananas += priceSpan[t + 3];
                 }
+
+                int nextStart = t - wait + 2000;
+                int inSpan = deltaSpan[nextStart..].IndexOf(target);
+                if (inSpan == -1)
+                    break;
+                t = nextStart + inSpan;
             }
+
+            bestBananas = long.Max(bestBananas, bananas);
         }
         Console.WriteLine($"Bananas: {bestBananas}");
     }
