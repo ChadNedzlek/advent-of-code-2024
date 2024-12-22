@@ -35,8 +35,10 @@ public static class Algorithms
         public abstract TIdentity GetIdentity();
         public abstract TScore GetScore();
         public abstract bool IsBetterScore(TScore a, TScore b);
+        public abstract IComparer<TScore> ScoreComparer { get; }
 
-        public TState Search() => PrioritySearch<TState, TPriority, TIdentity, TScore>((TState)this);
+        public TState Search() => PrioritySearchSingle<TState, TPriority, TIdentity, TScore>((TState)this);
+        public List<TState> SearchAll() => PrioritySearchAll<TState, TPriority, TIdentity, TScore>((TState)this);
     }
 
     public class CharMapAStar : BasicPriorityState<GPoint2<int>>
@@ -80,6 +82,7 @@ public static class Algorithms
         }
 
         protected override long GetCostTo(GPoint2<int> target) => (target - Current).OrthogonalDistance;
+        public override IComparer<long> ScoreComparer => Comparer<long>.Default;
     }
 
     public abstract class BasicPriorityState<T> : PriorityState<BasicPriorityState<T>, long, T, long>
@@ -134,7 +137,7 @@ public static class Algorithms
         public bool ReachedGoal(T test, T goal) => test.Equals(goal);
     }
 
-    public sealed class BasicPriorityState<TDriver, TSearch> : PriorityState<BasicPriorityState<TDriver, TSearch>, long, TSearch, long>
+    public class BasicPriorityState<TDriver, TSearch> : PriorityState<BasicPriorityState<TDriver, TSearch>, long, TSearch, long>
         where TDriver : IPrioritySearchable<TSearch>
         where TSearch : IEquatable<TSearch>
     {
@@ -172,39 +175,131 @@ public static class Algorithms
         public override long GetScore() => Cost;
 
         public override bool IsBetterScore(long a, long b) => a.CompareTo(b) < 0;
+        public override IComparer<long> ScoreComparer => Comparer<long>.Default;
     }
 
-    public static TState PrioritySearch<TState, TPriority, TIdentity, TScore>(TState start)
-    where TState : PriorityState<TState, TPriority, TIdentity, TScore>
-        => PrioritySearch(
+    public static TState PrioritySearchSingle<TState, TPriority, TIdentity, TScore>(TState start)
+        where TState : PriorityState<TState, TPriority, TIdentity, TScore>
+        => PrioritySearchSingle(
             start,
             s => s.GetNextState(),
             s => s.IsEndState(),
             s => s.GetPriority(),
             s => s.GetIdentity(),
             s => s.GetScore(),
-            start.IsBetterScore);
+            start.ScoreComparer);
+    public static List<TState> PrioritySearchAll<TState, TPriority, TIdentity, TScore>(TState start)
+        where TState : PriorityState<TState, TPriority, TIdentity, TScore>
+        => PrioritySearchAll(
+            start,
+            s => s.GetNextState(),
+            s => s.IsEndState(),
+            s => s.GetPriority(),
+            s => s.GetIdentity(),
+            s => s.GetScore(),
+            start.ScoreComparer);
 
-    public static TState PrioritySearch<TState, TPriority, TIdentity, TScore>(TState initial,
+    public static TState PrioritySearchSingle<TState, TPriority, TIdentity, TScore>(
+        TState initial,
         Func<TState, IEnumerable<TState>> nextStates,
         Func<TState, bool> isEndState,
         Func<TState, TPriority> getPriority,
         Func<TState, TIdentity> getIdentity,
         Func<TState, TScore> getScore,
-        Func<TScore, TScore, bool> isBetterScore)
+        IComparer<TScore> scoreCompare
+    )
+        => PrioritySearchCore(
+                initial,
+                nextStates,
+                isEndState,
+                getPriority,
+                getIdentity,
+                getScore,
+                scoreCompare,
+                findAllBest: false
+            )
+            .singleState;
+    
+    public static List<TState> PrioritySearchAll<TState, TPriority, TIdentity, TScore>(
+        TState initial,
+        Func<TState, IEnumerable<TState>> nextStates,
+        Func<TState, bool> isEndState,
+        Func<TState, TPriority> getPriority,
+        Func<TState, TIdentity> getIdentity,
+        Func<TState, TScore> getScore,
+        IComparer<TScore> scoreCompare
+    )
+        => PrioritySearchCore(
+                initial,
+                nextStates,
+                isEndState,
+                getPriority,
+                getIdentity,
+                getScore,
+                scoreCompare,
+                findAllBest: true
+            )
+            .allStates;
+
+    private static (TState singleState, List<TState> allStates) PrioritySearchCore<TState, TPriority, TIdentity, TScore>(TState initial,
+        Func<TState, IEnumerable<TState>> nextStates,
+        Func<TState, bool> isEndState,
+        Func<TState, TPriority> getPriority,
+        Func<TState, TIdentity> getIdentity,
+        Func<TState, TScore> getCost,
+        IComparer<TScore> costComparer,
+        bool findAllBest = false)
     {
         PriorityQueue<TState, TPriority> queue = new();
         Dictionary<TIdentity, TScore> loopbackDetection = new();
         queue.Enqueue(initial, getPriority(initial));
+        TScore currentLowestCost = default;
+        List<TState> lowestCostStates = [];
+        bool hasSolution = false;
         while (queue.TryDequeue(out var state, out var p))
         {
             if (isEndState(state))
-                return state;
+            {
+                if (!findAllBest)
+                {
+                    return (state, null);
+                }
+
+                TScore score = getCost(state);
+                if (hasSolution)
+                {
+                    switch (costComparer.Compare(score, currentLowestCost))
+                    {
+                        case <0:
+                            lowestCostStates.Clear();
+                            currentLowestCost = score;
+                            goto case 0;
+                        case 0:
+                            lowestCostStates.Add(state);
+                            break;
+                        case >1:
+                            break;
+                    }
+                    continue;
+                }
+
+                hasSolution = true;
+                currentLowestCost = score;
+                lowestCostStates.Add(state);
+                continue;
+            }
 
             var next = nextStates(state);
 
             foreach (var n in next)
-            {
+            {                    
+                var score = getCost(n);
+                if (hasSolution && costComparer.Compare(score, currentLowestCost) > 0)
+                {
+                    // It's already too expensive, discard it
+                    continue;
+                }
+
                 if (getIdentity != null)
                 {
                     var stateId = getIdentity(n);
@@ -213,10 +308,9 @@ public static class Algorithms
                         stateId,
                         out bool exists
                     );
-                    var score = getScore(n);
                     if (exists)
                     {
-                        if (!isBetterScore(score, loopbackEntry))
+                        if (costComparer.Compare(score, loopbackEntry) >= 0)
                         {
                             // We already had one, and it was already as good as or better
                             continue;
@@ -232,7 +326,7 @@ public static class Algorithms
             }
         }
 
-        return default;
+        return (default, lowestCostStates);
     }
     
     public static TState BreadthFirstSearch<TState, TIdentity, TScore>(TState initial,

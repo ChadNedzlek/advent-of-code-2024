@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using ChadNedzlek.AdventOfCode.Library;
 using Google.Protobuf.Collections;
 
@@ -45,24 +46,22 @@ public class Problem20 : DualProblemBase
 
         GPoint2<int> start = default;
         GPoint2<int> end = default;
-        for (var r = 0; r < data.Length; r++)
         {
-            string s = data[r];
-            for (var c = 0; c < s.Length; c++)
+            Span<char> searchFor = ['S', 'E'];
+            for (var r = 0; r < data.Length; r++)
             {
-                switch (s[c])
-                {
-                    case 'S': start = (r, c); break;
-                    case 'E': end = (r, c); break;
-                }
+                ReadOnlySpan<char> s = data[r];
+                var index = s.IndexOfAny(searchFor);
+                if (index == -1) continue;
+                if (s[index] == 'S')
+                    start = (r, index);
+                else end = (r, index);
             }
         }
 
-
-        int[,] fromStartDistance = FillDistances(data, start);
-        int[,] fromEndDistance = FillDistances(data, end);
-        int baseCost = fromStartDistance.Get(end);
-        Dictionary<long, long> savingsAgg = [];
+        short[,] fromStartDistance = FillDistances(data, start, h, w);
+        // short baseCost = fromStartDistance[end.Row, end.Col];
+        //Dictionary<long, long> savingsAgg = [];
         int count = 0;
         for (int r1 = 1; r1 < h - 1; r1++)
         {
@@ -75,26 +74,25 @@ public class Problem20 : DualProblemBase
                 {
                     int c2Lower = int.Max(1, c1 - (20 - rDistance));
                     int c2Upper = int.Min(w - 1, c1 + (20 - rDistance));
+                    var before = fromStartDistance[r1, c1];
                     for (int c2 = c2Lower; c2 <= c2Upper; c2++)
                     {
                         int cheatCost = rDistance + int.Abs(c2 - c1);
                         if (cheatCost > 20)
                             continue;
+                        var after = fromStartDistance[r2, c2];
 
-                        var before = fromStartDistance[r1, c1];
-                        var after = fromEndDistance[r2, c2];
+                        // if (before == -1 || after == -1)
+                        //     continue;
 
-                        if (before == -1 || after == -1)
-                            continue;
-
-                        var savings = baseCost - (before + cheatCost + after);
-                        if (savings > 0)
-                        {
-                            // if (Helpers.IncludeVerboseOutput)
-                            // {
-                            //     savingsAgg.Increment(savings);
-                            // }
-                        }
+                        var savings = after - before + cheatCost;
+                        // if (savings > 0)
+                        // {
+                        //     // if (Helpers.IncludeVerboseOutput)
+                        //     // {
+                        //     //     savingsAgg.Increment(savings);
+                        //     // }
+                        // }
 
                         if (savings >= 100)
                         {
@@ -105,40 +103,41 @@ public class Problem20 : DualProblemBase
             }
         }
 
-        if (Helpers.IncludeVerboseOutput)
-        {
-            foreach ((long amount, long c) in savingsAgg.OrderBy(s => s.Key))
-            {
-                Console.WriteLine($"There are {c} cheats that save {amount} picoseconds");
-            }
-        }
+        // if (Helpers.IncludeVerboseOutput)
+        // {
+        //     foreach ((long amount, long c) in savingsAgg.OrderBy(s => s.Key))
+        //     {
+        //         Console.WriteLine($"There are {c} cheats that save {amount} picoseconds");
+        //     }
+        // }
 
         Console.WriteLine($"There are {count} worthwhile cheats");
     }
 
-    private static int[,] FillDistances(string[] data, GPoint2<int> fromPoint)
+    private static short[,] FillDistances(string[] data, GPoint2<int> fromPoint, int nRows, int nCols)
     {
-        int[,] fromStartDistance = data.Select2D(_ => -1);
-        fromStartDistance.TrySet(fromPoint, 0);
+        short[,] distances = new short[nRows, nCols];
+        distances.AsFlatSpan().Fill(-1);
+        distances[fromPoint.Row, fromPoint.Col] = 0;
         Queue<GPoint2<int>> search = [];
         search.Enqueue(fromPoint);
         while (search.TryDequeue(out var p))
         {
-            var cost = fromStartDistance.Get(p);
+            short cost = distances[p.Row, p.Col];
             foreach (var dir in Helpers.OrthogonalDirections)
             {
                 var target = p + dir;
                 if (data.Get(target, '#') == '#') continue;
 
-                int prevCost = fromStartDistance.Get(target);
-                if (prevCost <= cost + 1 && prevCost >= 0) continue;
+                short prevCost = distances[target.Row, target.Col];
+                if (prevCost >= 0 && prevCost <= cost + 1) continue;
 
-                fromStartDistance.TrySet(target, cost + 1);
+                distances[target.Row, target.Col] = (short)(cost + 1);
                 search.Enqueue(target);
             }
         }
 
-        return fromStartDistance;
+        return distances;
     }
 
     public class CheatingRacer : Algorithms.IPrioritySearchable<GPoint2<int>>

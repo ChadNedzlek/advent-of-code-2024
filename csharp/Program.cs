@@ -27,6 +27,8 @@ internal static class Program
         ExecutionMode = ExecutionMode.Normal;
         bool menu = false;
         int puzzle = 0;
+
+        bool benchmark = false;
         var os = new OptionSet
         {
             { "example|sample|s|e", v => ExecutionMode = ExecutionMode.Sample },
@@ -35,6 +37,7 @@ internal static class Program
             { "prompt|p", v => menu = v != null },
             { "verbose|v", v => Helpers.IncludeVerboseOutput = (v != null) },
             { "puzzle|z=", v => puzzle = int.Parse(v) },
+            { "benchmark|b=", v => benchmark = v != null },
         };
 
         var left = os.Parse(args);

@@ -1,7 +1,6 @@
-﻿using System;
+﻿using System;using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using System.Runtime.Versioning;
 
 namespace ChadNedzlek.AdventOfCode.Library;
 
@@ -112,5 +111,13 @@ public readonly struct GPoint2<T> : IAdditionOperators<GPoint2<T>, GPoint2<T>, G
         return !left.Equals(right);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public GPoint2<T> Abs() => (T.Abs(Row), T.Abs(Col));
+
     public override string ToString() => $"{{{Row}, {Col}}}";
+}
+
+public static class GPoint2
+{
+    public static GPoint2<long> ToLong(this GPoint2<int> p) => (p.Row, p.Col);
 }

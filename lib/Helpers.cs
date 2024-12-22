@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using JetBrains.Annotations;
 
@@ -73,6 +74,15 @@ public static class Helpers
         for (int i1 = 0; i1 < arr[0].Length; i1++)
         {
             yield return (arr[i0][i1], (i0, i1));
+        }
+    }
+    
+    public static IEnumerable<(T value, GPoint2<int> point)> AsEnumerableWithPoint<T>(this T[,] arr)
+    {
+        for (int i0 = 0; i0 < arr.GetLength(0); i0++)
+        for (int i1 = 0; i1 < arr.GetLength(1); i1++)
+        {
+            yield return (arr[i0,i1], (i0, i1));
         }
     }
 
@@ -591,9 +601,6 @@ public static class Helpers
         return l;
     }
 
-    public static IReadOnlyList<IReadOnlyList<T>> Select<T>(this IReadOnlyList<string> source, Func<char, T> selector)
-        => Select(source, (_, _, v) => selector(v));
-
     public static T[,] Select2D<T>(this IReadOnlyList<string> source, Func<int, int, char, T> selector)
     {
         T[,] res = new T[source.Count, source[0].Length];
@@ -694,4 +701,16 @@ public static class Helpers
     public static T Square<T>(this T value)
         where T : IBinaryInteger<T>
         => value * value;
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Span<T> AsFlatSpan<T>(this T[,] array)
+    {
+        ref T first = ref Unsafe.As<byte, T>(ref MemoryMarshal.GetArrayDataReference(array));
+        return MemoryMarshal.CreateSpan(ref first, array.Length);
+    }
+
+    public static GPoint2<int> RotateClockwise(this GPoint2<int> p) => (p.Col, -p.Row);
+    public static GPoint2<int> RotateCounterclockwise(this GPoint2<int> p) => (-p.Col, p.Row);
+    public static Point2<int> RotateClockwise(this Point2<int> p) => (p.Y, -p.X);
+    public static Point2<int> RotateCounterclockwise(this Point2<int> p) => (-p.Y, p.X);
 }

@@ -14,14 +14,14 @@ public class Problem16 : SyncProblemBase
         GPoint2<int> start = data.AsEnumerableWithPoint().FirstOrDefault(x => x.value == 'S').point;
         GPoint2<int> end = data.AsEnumerableWithPoint().FirstOrDefault(x => x.value == 'E').point;
 
-        var result = Algorithms.PrioritySearch(
+        var result = Algorithms.PrioritySearchSingle(
             new PriorityState(map, start, (0,1), end),
             s => s.Next(),
             s => s.Current == s.Target,
             s => (s.Target - s.Current).OrthogonalDistance + s.Cost,
             s => s.Current,
             s => s.Cost,
-            (a, b) => a < b
+            Comparer<int>.Default
         );
 
         var path = Backtrace(result);
