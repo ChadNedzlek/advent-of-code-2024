@@ -65,9 +65,23 @@ public class Problem21 : SyncProblemBase
             levelCosts.Add(i, distances);
         }
 
-        Dictionary<(char from, char to), long> oneIndirectionCost = [];
+        Dictionary<(char from, char to), long> fullIndirectionCost = [];
         {
             var prev = levelCosts[iterations - 1];
+            foreach (((char from, char to) key, ImmutableList<string> paths) in primaryPaths)
+            {
+                long best = long.MaxValue;
+                foreach (var path in paths)
+                {
+                    best = long.Min(best, ("A" + path).Zip(path).Sum(d => prev[(d.First, d.Second)]));
+                }
+
+                fullIndirectionCost.Add(key, best);
+            }
+        }
+        Dictionary<(char from, char to), long> oneIndirectionCost = [];
+        {
+            var prev = levelCosts[1];
             foreach (((char from, char to) key, ImmutableList<string> paths) in primaryPaths)
             {
                 long best = long.MaxValue;
@@ -80,16 +94,27 @@ public class Problem21 : SyncProblemBase
             }
         }
 
-        long total = 0;
+        long total1 = 0;
+        long total2 = 0;
         foreach (var line in data.Where(l => !string.IsNullOrWhiteSpace(l)))
         {
-            var cost = ("A" + line).Zip(line).Sum(d => oneIndirectionCost[(d.First, d.Second)]);
-            var value = long.Parse(line[..^1]);
-            var part = cost * value;
-            total += part;
-            Helpers.VerboseLine($"Line {line} has value {cost} * {value} = {part}");
+            {
+                var cost = ("A" + line).Zip(line).Sum(d => oneIndirectionCost[(d.First, d.Second)]);
+                var value = long.Parse(line[..^1]);
+                var part = cost * value;
+                total1 += part;
+                Helpers.VerboseLine($"Part 1: Line {line} has value {value} * {cost} = {part}");
+            }
+            {
+                var cost = ("A" + line).Zip(line).Sum(d => fullIndirectionCost[(d.First, d.Second)]);
+                var value = long.Parse(line[..^1]);
+                var part = cost * value;
+                total2 += part;
+                Helpers.VerboseLine($"Part 2: Line {line} has value {value} * {cost} = {part}");
+            }
         }
-        Console.WriteLine($"Total: {total}");
+        Console.WriteLine($"Part 1: {total1}");
+        Console.WriteLine($"Part 2: {total2}");
 
         Dictionary<(char from, char to),ImmutableList<string>> FillPaths(char[,] keypad)
         {
