@@ -75,10 +75,18 @@ public class Problem24 : SyncProblemBase
 
         {
             gates = BuildCorrectGates(gates, gateSwaps, bits - 1, out var lowerCarryGate);
+            var dest = $"z{bits:D2}";
             var partialBits = gates.Where(g => g.HasInput($"x{bits:D2}") && g.HasInput($"y{bits:D2}")).ToDictionary(x => x.Operation);
             var partialCarry = partialBits["AND"];
             var partialSum = partialBits["XOR"];
             var sum = FindOrCorrect(ref gates, partialSum.Destination, lowerCarryGate.Destination, "XOR", gateSwaps);
+            if (sum.Destination != dest && sum.Destination[0] == 'z')
+            {
+                Console.WriteLine($"Should swap {sum.Destination} and {dest}");
+                gateSwaps.Add(sum.Destination, dest);
+                gates = gates.Select(g => g.Swap(sum.Destination, dest)).ToImmutableList();
+            }
+
             var sumCarry = FindOrCorrect(ref gates, partialSum.Destination, lowerCarryGate.Destination, "AND", gateSwaps);
             if (partialCarry == null)
             {
@@ -166,18 +174,23 @@ public class Problem24 : SyncProblemBase
         return output;
     }
 
-    public record Gate(string A, string B, string Operation, string Destination)
+    public record Gate
     {
+        public Gate(string A, string B, string Operation, string Destination)
+        {
+            if (A[0] == 'z' || B[0] == 'z')
+            {
+            }
+
+            this.A = A;
+            this.B = B;
+            this.Operation = Operation;
+            this.Destination = Destination;
+        }
+
         public bool HasInput(string i) => A == i || B == i;
         
         public string OtherInput(string i) => A == i ? B : A;
-
-        public Gate Rename(string f, string t)
-        {
-            if (A != f && B != f && Destination != f) return this;
-            
-            return new Gate(A == f ? t : A, B == f ? t : B, Operation, Destination == f ? t : Destination);
-        }
 
         public Gate Swap(string a, string b)
         {
@@ -188,6 +201,19 @@ public class Problem24 : SyncProblemBase
                 Operation,
                 Destination == a ? b : Destination == b ? a : Destination
             );
+        }
+
+        public string A { get; init; }
+        public string B { get; init; }
+        public string Operation { get; init; }
+        public string Destination { get; init; }
+
+        public void Deconstruct(out string A, out string B, out string Operation, out string Destination)
+        {
+            A = this.A;
+            B = this.B;
+            Operation = this.Operation;
+            Destination = this.Destination;
         }
     }
 }
