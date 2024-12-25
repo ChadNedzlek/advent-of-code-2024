@@ -23,18 +23,19 @@ public class Problem24 : SyncProblemBase
         ulong output = RunLogic(gates, start);
         Console.WriteLine($"Value: {output}");
         Dictionary<string, string> gateSwaps = [];
-        ImmutableList<Gate> corrected = BuildCorrectGates(gates.Values.ToImmutableList(), gateSwaps);
+        ImmutableList<Gate> corrected = BuildAdderFromExistingGates(gates.Values.ToImmutableList(), gateSwaps);
 
         var result = RunLogic(corrected.ToImmutableDictionary(g => g.Destination), 0, 123456, 45);
-        if (result != 45)
+        if (result != 123456)
         {
+            Console.WriteLine($"Adder did not produce correct answer!!!");
         }
 
         Console.WriteLine("After building a valid adder, the following gates are wrong:");
         Console.WriteLine(string.Join(',', gateSwaps.Keys.Concat(gateSwaps.Values).OrderBy()));
     }
 
-    private ImmutableList<Gate> BuildCorrectGates(
+    private ImmutableList<Gate> BuildAdderFromExistingGates(
         ImmutableList<Gate> gates,
         Dictionary<string, string> gateSwaps,
         int bits = -1
@@ -45,10 +46,10 @@ public class Problem24 : SyncProblemBase
             bits = gates.Where(g => g.Destination[0] == 'z').Max(g => int.Parse(g.Destination[1..]));
         }
 
-        return BuildCorrectGates(gates, gateSwaps, bits - 1, out _);
+        return BuildAdderFromExistingGates(gates, gateSwaps, bits - 1, out _);
     }
 
-    private ImmutableList<Gate> BuildCorrectGates(
+    private ImmutableList<Gate> BuildAdderFromExistingGates(
         ImmutableList<Gate> gates,
         Dictionary<string, string> gateSwaps,
         int bits,
@@ -74,7 +75,7 @@ public class Problem24 : SyncProblemBase
         }
 
         {
-            gates = BuildCorrectGates(gates, gateSwaps, bits - 1, out var lowerCarryGate);
+            gates = BuildAdderFromExistingGates(gates, gateSwaps, bits - 1, out var lowerCarryGate);
             var dest = $"z{bits:D2}";
             var partialBits = gates.Where(g => g.HasInput($"x{bits:D2}") && g.HasInput($"y{bits:D2}")).ToDictionary(x => x.Operation);
             var partialCarry = partialBits["AND"];
@@ -82,7 +83,7 @@ public class Problem24 : SyncProblemBase
             var sum = FindOrCorrect(ref gates, partialSum.Destination, lowerCarryGate.Destination, "XOR", gateSwaps);
             if (sum.Destination != dest && sum.Destination[0] == 'z')
             {
-                Console.WriteLine($"Should swap {sum.Destination} and {dest}");
+                Helpers.VerboseLine($"Should swap {sum.Destination} and {dest}");
                 gateSwaps.Add(sum.Destination, dest);
                 gates = gates.Select(g => g.Swap(sum.Destination, dest)).ToImmutableList();
             }
@@ -107,7 +108,7 @@ public class Problem24 : SyncProblemBase
         {
             var b = gates.FirstOrDefault(g => g.Operation == operation && g.HasInput(inputB));
             var o = b.OtherInput(inputB);
-            Console.WriteLine($"Should swap {inputA} and {o}");
+            Helpers.VerboseLine($"Should swap {inputA} and {o}");
             swaps.Add(inputA, o);
             gates = gates.Select(g => g.Swap(inputA, o)).ToImmutableList();
             return b.Swap(inputA, o);
@@ -116,7 +117,7 @@ public class Problem24 : SyncProblemBase
         if (!a.HasInput(inputB))
         {
             var o = a.OtherInput(inputA);
-            Console.WriteLine($"Should swap {inputB} and {o}");
+            Helpers.VerboseLine($"Should swap {inputB} and {o}");
             swaps.Add(inputB, o);
             gates = gates.Select(g => g.Swap(inputB, o)).ToImmutableList();
             return a.Swap(inputB, o);
